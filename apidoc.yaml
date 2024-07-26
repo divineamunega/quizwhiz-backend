@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: QuizzWhizz
+  version: 1.0.0
+  description: API for the quizwhiz project for Aptech's Career Quest.
+servers:
+  - url: https://example.com/api/v1
+paths:
+  /quiz:
+    get:
+      summary: Lists all available public quizzes. Can be filtered according to status [In progress, Completed, Scheduled]
+      parameters:
+        - name: status
+          in: query
+          description: Filter quizzes by status.
+          required: false
+          schema:
+            type: string
+            enum: [progress, completed, scheduled]
+        - name: sort
+          in: query
+          description: Sort quizzes by a specific field (e.g., 'title (Alphabetical Order)' or 'date') Use the minus convention for ascending sorting.
+          required: false
+          schema:
+            type: string
+            enum: [title, date]
+        - name: page
+          in: query
+          description: The page number to retrieve (for pagination).
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - name: size
+          in: query
+          description: The number of items per page (for pagination).
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: A list of available quizzes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status message
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        format: int32
+                        description: The current page number.
+                      size:
+                        type: integer
+                        format: int32
+                        description: The number of items per page.
+                      totalItems:
+                        type: integer
+                        format: int32
+                        description: The total number of available quizzes.
+                      totalPages:
+                        type: integer
+                        format: int32
+                        description: The total number of pages.
+                  quizzes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uuid:
+                          type: string
+                          description: Unique identifier for the quiz.
+                        quizid:
+                          type: string
+                          description: Unique Id for a quiz to be played
+                        title:
+                          type: string
+                          description: Title of the quiz.
+                        status:
+                          type: string
+                          description: Current status of the quiz.
+                        dateScheduled:
+                          type: string
+                          format: date-time
+                          description: The date when the quiz was scheduled
+                required:
+                  - quizzes
+    post:
+    "201":

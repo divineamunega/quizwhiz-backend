@@ -1,12 +1,10 @@
-import express from "express";
+import { configDotenv } from "dotenv";
+import app from "./app";
 
-const app = express();
-const port = 5000;
+configDotenv({ path: "./env" });
 
-app.get("/", (req, res) => {
-	res.send("Hello, TypeScript Node Express!");
-});
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, () => {
-	console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+	console.log(`Server running on port ${PORT} in {development mode}`);
 });
