@@ -3,9 +3,11 @@ import express from "express";
 import QuizRoute from "./routes/QuizRoutes";
 import AuthRoute from "./routes/AuthRoutes";
 import AppError from "./errors/AppError";
+import morgan from "morgan";
 import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
 const app = express();
 app.use(express.json());
+app.use(morgan("tiny"));
 
 app.use("/api/v1/quiz", QuizRoute);
 app.use("/api/v1/auth", AuthRoute);
@@ -28,7 +30,7 @@ app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 
 	if ((process.env.ENVIROMENT = "DEVELOPMENT")) {
 		formatedErr = handleErrorDev(error);
-		res.status(formatedErr.statusCode).json(formatedErr);
+		res.status(formatedErr.statusCode || 500).json(formatedErr);
 		return;
 	}
 });
