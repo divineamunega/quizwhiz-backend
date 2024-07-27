@@ -1,49 +1,38 @@
 openapi: 3.0.0
 info:
-  title: QuizzWhizz
+  title: QuizzWhizz API
   version: 1.0.0
-  description: API for the quizwhiz project for Aptech's Career Quest.
+  description: API documentation for the QuizzWhizz application.
 servers:
   - url: https://example.com/api/v1
 paths:
-  /quiz:
-    get:
-      summary: Lists all available public quizzes. Can be filtered according to status [In progress, Completed, Scheduled]
-      parameters:
-        - name: status
-          in: query
-          description: Filter quizzes by status.
-          required: false
-          schema:
-            type: string
-            enum: [progress, completed, scheduled]
-        - name: sort
-          in: query
-          description: Sort quizzes by a specific field (e.g., 'title (Alphabetical Order)' or 'date') Use the minus convention for ascending sorting.
-          required: false
-          schema:
-            type: string
-            enum: [title, date]
-        - name: page
-          in: query
-          description: The page number to retrieve (for pagination).
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-        - name: size
-          in: query
-          description: The number of items per page (for pagination).
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
+  /signup:
+    post:
+      summary: User signup
+      description: Creates a new user account and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Divine
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+                - name
+                - email
+                - password
       responses:
-        "200":
-          description: A list of available quizzes.
+        "201":
+          description: User successfully created.
           content:
             application/json:
               schema:
@@ -51,49 +40,46 @@ paths:
                 properties:
                   status:
                     type: string
-                    description: The status message
                     example: success
                   data:
                     type: object
                     properties:
-                      page:
-                        type: integer
-                        format: int32
-                        description: The current page number.
-                      size:
-                        type: integer
-                        format: int32
-                        description: The number of items per page.
-                      totalItems:
-                        type: integer
-                        format: int32
-                        description: The total number of available quizzes.
-                      totalPages:
-                        type: integer
-                        format: int32
-                        description: The total number of pages.
-                  quizzes:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        uuid:
-                          type: string
-                          description: Unique identifier for the quiz.
-                        quizid:
-                          type: string
-                          description: Unique Id for a quiz to be played
-                        title:
-                          type: string
-                          description: Title of the quiz.
-                        status:
-                          type: string
-                          description: Current status of the quiz.
-                        dateScheduled:
-                          type: string
-                          format: date-time
-                          description: The date when the quiz was scheduled
-                required:
-                  - quizzes
-    post:
-    "201":
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          email:
+                            type: string
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "403":
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Please provide a valid email, Please provide a password, Your password must be at least 8 characters long
+
+        "409":
+          description: Conflict, email already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: A user with that email already exists.

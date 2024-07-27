@@ -24,7 +24,8 @@ app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 
 	if (process.env.ENVIROMENT === "PRODUCTION") {
 		formatedErr = handleErrorProd(error);
-		res.status(formatedErr.statusCode).json(formatedErr);
+		const { statusCode, ...remainingFormatedErr } = formatedErr;
+		res.status(statusCode).json(remainingFormatedErr);
 		return;
 	}
 
