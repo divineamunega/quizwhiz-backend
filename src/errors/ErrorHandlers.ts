@@ -7,15 +7,6 @@ import AppError from "./AppError";
  * @returns A standardized error response
  */
 const handleErrorProd = (err: any) => {
-	// Return generic error message for non-operational errors
-	if (!err.isOperational) {
-		return {
-			status: "error",
-			message: "An unexpected error occurred. Please try again later.",
-			statusCode: 500,
-		};
-	}
-
 	// Handle validation errors specifically
 	if (err.type === "express_validator") {
 		const errorMessages = err.errorObj?.map((obj: any) => obj.msg).join(", ");
@@ -37,6 +28,15 @@ const handleErrorProd = (err: any) => {
 			status: "fail",
 			statusCode: 409,
 			message,
+		};
+	}
+
+	// Return generic error message for non-operational errors
+	if (!err.isOperational) {
+		return {
+			status: "error",
+			message: "An unexpected error occurred. Please try again later.",
+			statusCode: 500,
 		};
 	}
 
