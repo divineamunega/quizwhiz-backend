@@ -6,7 +6,7 @@ import AppError from "./AppError";
  * @param err - The AppError instance
  * @returns A standardized error response
  */
-const handleErrorProd = (err: AppError) => {
+const handleErrorProd = (err: any) => {
 	// Return generic error message for non-operational errors
 	if (!err.isOperational) {
 		return {
@@ -29,6 +29,17 @@ const handleErrorProd = (err: AppError) => {
 		return error;
 	}
 
+	// Handle Email duplicate errors (hopefully)
+	if (err.code === "P2002") {
+		const message = `A user with that email already exists.`;
+
+		return {
+			status: "fail",
+			statusCode: 409,
+			message,
+		};
+	}
+
 	// Return the error response for all other operational errors
 	return {
 		status: err.status,
@@ -45,6 +56,7 @@ const handleErrorProd = (err: AppError) => {
  */
 const handleErrorDev = (err: AppError) => {
 	return {
+		message: err.message,
 		err,
 		stack: err.stack,
 		statusCode: err.statusCode,
