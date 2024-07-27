@@ -24,8 +24,8 @@ const signup = AsyncErrorHandler(async (req, res, next) => {
 	// Send back user data + JWT to client
 	res.status(201).json({
 		status: "success",
-		token,
 		data: {
+			token,
 			user: {
 				id: newUser.id,
 				name: newUser.name,
