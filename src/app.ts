@@ -5,7 +5,8 @@ import QuizRoute from "./routes/QuizRoutes";
 const app = express();
 app.use(express.json());
 
-app.use("/api/v1/", QuizRoute);
+app.use("/api/v1/quiz", QuizRoute);
+app.use("/api/v1/auth");
 
 app.use("*", (req: Request, res: Response) => {
 	res.status(404).json({
