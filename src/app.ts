@@ -1,7 +1,11 @@
-import express from "express";
 import { Response, Request } from "express";
+import express from "express";
+import QuizRoute from "./routes/QuizRoutes";
 
 const app = express();
+app.use(express.json());
+
+app.use("/api/v1/", QuizRoute);
 
 app.use("*", (req: Request, res: Response) => {
 	res.status(404).json({
