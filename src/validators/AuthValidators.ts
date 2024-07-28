@@ -47,6 +47,7 @@ const signupValidator = () => [
 	body("email")
 		.exists()
 		.withMessage("A user must have an email")
+		.trim()
 		.isEmail()
 		.withMessage("Please provide a valid email"),
 	body("password")
@@ -57,4 +58,25 @@ const signupValidator = () => [
 	handleData,
 ];
 
-export { signupValidator };
+const handleLoginData = function (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		// Pass validation errors to the next middleware (error handler)
+		return next(new AppError("Authentication Error", 400, null, "login_error"));
+	}
+
+	// Attach validated data to the request object
+	req.data = matchedData(req);
+	next();
+};
+const loginValidator = () => [
+	body("password").isLength({ min: 8 }),
+	body("email").trim().isEmail(),
+	handleLoginData,
+];
+
+export { signupValidator, loginValidator };

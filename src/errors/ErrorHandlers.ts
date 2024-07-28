@@ -32,6 +32,15 @@ const handleErrorProd = (err: any) => {
 		};
 	}
 
+	// Handle Failed Login Errors
+	if (err.type === "login_error") {
+		return {
+			status: "fail",
+			statusCode: 403,
+			message: "Email or password is incorrect.",
+		};
+	}
+
 	// Return generic error message for non-operational errors
 	if (!err.isOperational) {
 		return {

@@ -35,7 +35,11 @@ const signup = AsyncErrorHandler(async (req, res, next) => {
 	});
 });
 
-const login = AsyncErrorHandler(async (req, res, next) => {});
+const login = AsyncErrorHandler(async (req, res, next) => {
+	// Check If user exists?
+	// Check if password is correct
+	// Log user in 😁
+});
 
 const protect = AsyncErrorHandler(async (req, res, next) => {});
 
