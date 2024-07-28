@@ -1,9 +1,7 @@
-import AppError from "./AppError";
-
 /**
  * Handles errors for production environment.
  *
- * @param err - The AppError instance
+ * @param err - THe Error Instance
  * @returns A standardized error response
  */
 const handleErrorProd = (err: any) => {
@@ -54,10 +52,10 @@ const handleErrorProd = (err: any) => {
 /**
  * Handles errors for development environment.
  *
- * @param err - The AppError instance
+ * @param err - The Error INstance
  * @returns Detailed error information
  */
-const handleErrorDev = (err: AppError) => {
+const handleErrorDev = (err: any) => {
 	return {
 		message: err.message,
 		err,
