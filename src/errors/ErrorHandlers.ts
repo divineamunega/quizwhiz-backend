@@ -21,6 +21,9 @@ const handleErrorProd = (err: any) => {
 	}
 
 	// Handle Email duplicate errors (hopefully)
+	// TODO I have a better way to do this that will require finding a user with that email... But I guess it will take time.. Will look into it later
+	// P2002 Errors are for more than duplicate emails... SO that's why
+
 	if (err.code === "P2002") {
 		const message = `A user with that email already exists.`;
 
