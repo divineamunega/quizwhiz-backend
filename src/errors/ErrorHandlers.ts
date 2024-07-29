@@ -33,6 +33,8 @@ const handleErrorProd = (err: any) => {
 	}
 
 	// Handle Failed Login Errors
+	console.log(err.type === "login_error");
+
 	if (err.type === "login_error") {
 		return {
 			status: "fail",
@@ -41,8 +43,8 @@ const handleErrorProd = (err: any) => {
 		};
 	}
 
-	// Return generic error message for non-operational errors
 	if (!err.isOperational) {
+		// Return generic error message for non-operational errors
 		return {
 			status: "error",
 			message: "An unexpected error occurred. Please try again later.",
