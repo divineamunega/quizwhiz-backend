@@ -94,8 +94,8 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 		process.env.JWT_SECRET!
 	) as unknown as JwtPayload;
 
+	// Find User and throw error if no user found
 	const user = await prisma.user.findFirst({ where: { id: decoded.id } });
-
 	if (!user) {
 		throw new AppError(
 			"The user associated with token does not exist.",
@@ -105,9 +105,41 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 		);
 	}
 
-	res.json({
-		decoded,
-	});
+	// Assign the user to a user property on the req object
+	req.user = user;
+
+	// Free to pass on to the protected resource
+	next();
 });
+
+// TODO LATERRRR
+/* 
+const createSendToken = (user, statusCode, res) => {
+	const token = signToken(user.id);
+
+	const cookieOptions = {
+		expires: new Date(
+			Date.now() + process.env.JWT_COOKIE_EXPIRES_IN! * 24 * 60 * 60 * 1000
+		),
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production", // Cookie will be sent only over HTTPS
+		sameSite: "none", // Necessary for cross-domain cookies
+	};
+
+	res.cookie("jwt", token, cookieOptions);
+
+	res.status(statusCode).json({
+		status: "success",
+		data: {
+			token,
+			user: {
+				id: user.id,
+				name: user.name,
+				email: user.email,
+			},
+		},
+	});
+};
+*/
 
 export { signup, login, protect };

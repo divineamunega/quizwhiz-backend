@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { body, matchedData, validationResult } from "express-validator";
 import AppError from "../errors/AppError";
+import { User } from "@prisma/client";
 
 // Extend the Request interface to include a 'data' property
 declare module "express-serve-static-core" {
 	interface Request {
 		data?: any;
+		user?: User;
 	}
 }
 
