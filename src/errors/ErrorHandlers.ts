@@ -33,13 +33,20 @@ const handleErrorProd = (err: any) => {
 	}
 
 	// Handle Failed Login Errors
-	console.log(err.type === "login_error");
-
 	if (err.type === "login_error") {
 		return {
 			status: "fail",
 			statusCode: err.statusCode,
 			message: "Email or password is incorrect.",
+		};
+	}
+
+	if (err.name === "JsonWebTokenError") {
+		return {
+			status: "fail",
+			statusCode: 401,
+			message:
+				"Your token is invalid. Please login again to get another token.",
 		};
 	}
 

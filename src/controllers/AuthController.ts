@@ -3,6 +3,7 @@ import prisma from "../prisma";
 import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import { signToken } from "../utils/jwt";
 import AppError from "../errors/AppError";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Signup function
 const signup = AsyncErrorHandler(async (req, res, next) => {
@@ -76,4 +77,37 @@ const login = AsyncErrorHandler(async (req, res, next) => {
 	});
 });
 
-export { signup, login };
+const protect = AsyncErrorHandler(async (req, res, next) => {
+	// Get token from header
+	const token = req.headers.authorization?.split(" ")[1];
+	if (!token)
+		throw new AppError(
+			"Your token is invalid. Please login again to get another token.",
+			401,
+			null,
+			"invalid_token"
+		);
+
+	// Decode JWT token
+	const decoded = jwt.verify(
+		token,
+		process.env.JWT_SECRET!
+	) as unknown as JwtPayload;
+
+	const user = await prisma.user.findFirst({ where: { id: decoded.id } });
+
+	if (!user) {
+		throw new AppError(
+			"The user associated with token does not exist.",
+			401,
+			null,
+			"invalid_token"
+		);
+	}
+
+	res.json({
+		decoded,
+	});
+});
+
+export { signup, login, protect };
