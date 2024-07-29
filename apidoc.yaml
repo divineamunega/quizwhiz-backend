@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API documentation for the QuizzWhizz application.
 servers:
-  - url: https://example.com/api/v1
+  - url: https://quizwhiz-backend.onrender.com/api/v1
 paths:
   /auth/signup:
     post:
