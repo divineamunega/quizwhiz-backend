@@ -12,6 +12,13 @@ app.use(morgan("tiny"));
 app.use("/api/v1/quiz", QuizRoute);
 app.use("/api/v1/auth", AuthRoute);
 
+app.get("api/cron", (req: Request, res: Response) => {
+	console.log("CRON REQUEST");
+	res.status(200).json({
+		status: "success",
+		message: "Hello to the cronjob.",
+	});
+});
 app.use("*", (req: Request, res: Response) => {
 	res.status(404).json({
 		status: "fail",
