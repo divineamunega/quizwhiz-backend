@@ -4,8 +4,12 @@ import QuizRoute from "./routes/QuizRoutes";
 import AuthRoute from "./routes/AuthRoutes";
 import AppError from "./errors/AppError";
 import morgan from "morgan";
+import cors from "cors";
 import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
+
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
