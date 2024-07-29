@@ -36,7 +36,7 @@ const handleErrorProd = (err: any) => {
 	if (err.type === "login_error") {
 		return {
 			status: "fail",
-			statusCode: 403,
+			statusCode: err.statusCode,
 			message: "Email or password is incorrect.",
 		};
 	}

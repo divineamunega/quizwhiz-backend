@@ -66,7 +66,7 @@ const handleLoginData = function (
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		// Pass validation errors to the next middleware (error handler)
-		return next(new AppError("Authentication Error", 400, null, "login_error"));
+		return next(new AppError("Authentication Error", 401, null, "login_error"));
 	}
 
 	// Attach validated data to the request object
