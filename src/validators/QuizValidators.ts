@@ -21,7 +21,6 @@ const createQuestionValidator = function () {
 			.bail()
 			.withMessage("Every question must have at least 2 answers")
 			.custom((value, { req }) => {
-				console.log(req.body);
 				return Boolean(
 					req.body.answers?.some((obj: any) => {
 						return obj.isCorrect === true;

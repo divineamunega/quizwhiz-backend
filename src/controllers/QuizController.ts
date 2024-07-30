@@ -33,8 +33,41 @@ const createQuiz = AsyncErrorHandler(async function (
 });
 
 const createQuestions = AsyncErrorHandler(async (req, res, next) => {
-	// const quizId = req.params.id;
-	// const userId = req.user?.id;
+	const quizId = req.params.id;
+	const userId = req.user?.id;
+	const data = req.data;
+
+	const newQuestion = await prisma.$transaction(async (prisma) => {
+		const newQuestion = prisma.question.create({
+			data: {
+				question: data.question,
+				quizId: quizId,
+
+				answers: {
+					create: data.answers.map((answer: any) => {
+						return { answer: answer.answer, isCorrect: answer.isCorrect };
+					}),
+				},
+			},
+		});
+
+		// UPDATE QUIZ
+		await prisma.quiz.update({
+			where: { id: quizId },
+			data: {
+				numberOfQuestions: {
+					increment: 1,
+				},
+			},
+		});
+
+		return newQuestion;
+	});
+
+	res.status(200).json({
+		newQuestion,
+		userId,
+	});
 });
 
 export { createQuiz, createQuestions };
