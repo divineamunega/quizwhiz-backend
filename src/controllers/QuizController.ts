@@ -38,7 +38,6 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 	const userId = req.user?.id;
 	const data = req.data;
 
-	console.log(data);
 	const quiz = await prisma.quiz.findFirst({
 		where: { id: quizId, creatorId: userId },
 	});
@@ -71,8 +70,6 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 		});
 		return { question, answers };
 	});
-
-	console.log(answers);
 
 	res.status(200).json({
 		id: question.id,
