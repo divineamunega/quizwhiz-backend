@@ -1,8 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { body, matchedData, validationResult } from "express-validator";
-import AppError from "../errors/AppError";
 import { User } from "@prisma/client";
-
+import { handleData, handleLoginData } from "./handleRequestBody";
+import { body } from "express-validator";
 // Extend the Request interface to include a 'data' property
 declare module "express-serve-static-core" {
 	interface Request {
@@ -10,27 +8,6 @@ declare module "express-serve-static-core" {
 		user?: User;
 	}
 }
-
-/**
- * Middleware to handle validation errors and extract validated data.
- *
- * @param req - Express request object
- * @param res - Express response object
- * @param next - Express next middleware function
- */
-const handleData = (req: Request, res: Response, next: NextFunction): void => {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		// Pass validation errors to the next middleware (error handler)
-		return next(
-			new AppError("Validation Error", 400, errors.array(), "express_validator")
-		);
-	}
-
-	// Attach validated data to the request object
-	req.data = matchedData(req);
-	next();
-};
 
 /**
  * Validation chain for user signup.
@@ -60,21 +37,6 @@ const signupValidator = () => [
 	handleData,
 ];
 
-const handleLoginData = function (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		// Pass validation errors to the next middleware (error handler)
-		return next(new AppError("Authentication Error", 401, null, "login_error"));
-	}
-
-	// Attach validated data to the request object
-	req.data = matchedData(req);
-	next();
-};
 const loginValidator = () => [
 	body("password").isLength({ min: 8 }),
 	body("email").trim().isEmail(),
