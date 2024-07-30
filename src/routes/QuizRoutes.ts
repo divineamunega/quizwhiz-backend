@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { createQuiz } from "../controllers/QuizController";
+import { createQuestions, createQuiz } from "../controllers/QuizController";
 import { protect } from "../controllers/AuthController";
-import { createQuizValidator } from "../validators/QuizValidators";
+import {
+	createQuizValidator,
+	createQuestionValidator,
+} from "../validators/QuizValidators";
 
 const router = Router();
 
 router.post("/", createQuizValidator(), protect, createQuiz);
+router.post(
+	"/:id/question",
+	createQuestionValidator(),
+	protect,
+	createQuestions
+);
 
 export default router;

@@ -32,4 +32,9 @@ const createQuiz = AsyncErrorHandler(async function (
 	});
 });
 
-export { createQuiz };
+const createQuestions = AsyncErrorHandler(async (req, res, next) => {
+	// const quizId = req.params.id;
+	// const userId = req.user?.id;
+});
+
+export { createQuiz, createQuestions };
