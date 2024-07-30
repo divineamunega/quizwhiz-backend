@@ -32,7 +32,7 @@ model Quiz {
 }
 
 model Question {
-  id         Int       @id @default(autoincrement())
+  id         String       @id @default(uuid())
   question   String
   image      String?
   createdAt  DateTime  @default(now())
@@ -42,11 +42,11 @@ model Question {
 }
 
 model Answer {
-  id         Int        @id @default(autoincrement())
+  id         String       @id @default(uuid())
   isCorrect  Boolean
   answer     String
   question   Question   @relation(fields: [questionId], references: [id])
-  questionId Int
+  questionId String
 }
 
 enum QuizStatus {
