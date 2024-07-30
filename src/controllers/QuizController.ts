@@ -71,7 +71,7 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 		return { question, answers };
 	});
 
-	res.status(200).json({
+	res.status(201).json({
 		id: question.id,
 		question: question.question,
 		answers: answers.map((answer) => {
