@@ -3,7 +3,7 @@ import prisma from "../prisma";
 import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import AppError from "../errors/AppError";
 
-// JUst testing randome stuff
+// JUst testing random stuff
 const createQuiz = AsyncErrorHandler(async function (
 	req: Request,
 	res: Response,
