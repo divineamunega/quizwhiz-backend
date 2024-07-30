@@ -150,3 +150,162 @@ paths:
                   message:
                     type: string
                     example: Email or password is incorrect.
+  /quiz:
+    post:
+      summary: Create a new quiz
+      tags:
+        - Quiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "General Knowledge Quiz"
+                description:
+                  type: string
+                  example: "A quiz to test your general knowledge"
+              required:
+                - name
+                - description
+      responses:
+        "200":
+          description: Quiz successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "successful"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "1"
+                      creatorId:
+                        type: string
+                        example: "1"
+                      name:
+                        type: string
+                        example: "General Knowledge Quiz"
+                      description:
+                        type: string
+                        example: "A quiz to test your general knowledge"
+                      status:
+                        type: string
+                        example: "IDLE"
+                      numberOfQuestions:
+                        type: number
+                        example: 0
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2024-08-01T00:00:00.000Z"
+        "403":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "fail"
+                  message:
+                    type: string
+                    example: "A quiz must have a name, A quiz must have a description"
+
+  /quiz/{id}/questions:
+    post:
+      summary: Create questions and answers for a quiz
+      tags:
+        - Quiz
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the quiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                  example: "What is the capital of France?"
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      answer:
+                        type: string
+                        example: "Paris"
+                      isCorrect:
+                        type: boolean
+                        example: true
+              required:
+                - question
+                - answers
+      responses:
+        "200":
+          description: Question and answers successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "1"
+                  question:
+                    type: string
+                    example: "What is the capital of France?"
+                  answers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        answer:
+                          type: string
+                          example: "Paris"
+                        isCorrect:
+                          type: boolean
+                          example: true
+
+        "404":
+          description: Quiz not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "fail"
+                  message:
+                    type: string
+                    example: "This user does not have any quiz with the id {id}."
+        "403":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "fail"
+                  message:
+                    type: string
+                    example: "A question must have a question field, Each question must have an answer field, Every question must have at least 2 answers, A question must have at least one correct answer, Every answer must have an isCorrect field, iscorrect must be a boolean, Every answer object must have an answer field"
