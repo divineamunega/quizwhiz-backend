@@ -49,6 +49,7 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 		);
 
 	const { question, answers } = await prisma.$transaction(async (prisma) => {
+		// TODO TO make the numberOFQuestions field useful
 		const question = await prisma.question.create({
 			data: { question: data.question, quizId: quizId },
 		});
@@ -80,4 +81,37 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 	});
 });
 
-export { createQuiz, createQuestions };
+const getQuiz = AsyncErrorHandler(async (req, res, next) => {
+	const quizId = req.params.id;
+	const userId = req.user!.id;
+
+	const quiz = await prisma.quiz.findFirst({
+		where: { id: quizId, creator: { id: userId } },
+	});
+
+	if (!quiz)
+		throw new AppError(
+			`Could not find any quiz with the id ${quizId} in ${
+				req.user?.name[0].toUpperCase() + req.user!.name.slice(1)
+			}'s list of created quizes.`,
+			404
+		);
+
+	const questions = await prisma.question.findMany({ where: { quiz: quiz } });
+	res.status(200).json({
+		status: "success",
+		data: {
+			quiz: {
+				name: quiz.name,
+				description: quiz.description,
+				numberOfQuestions: questions.length,
+				questions: questions.map((question) => {
+					return { id: question.id, question: question.question };
+				}),
+			},
+		},
+	});
+});
+
+// https://quizwhiz-backend.onrender.com
+export { createQuiz, createQuestions, getQuiz };

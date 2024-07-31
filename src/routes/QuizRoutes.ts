@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createQuestions, createQuiz } from "../controllers/QuizController";
+import {
+	createQuestions,
+	createQuiz,
+	getQuiz,
+} from "../controllers/QuizController";
 import { protect } from "../controllers/AuthController";
 import {
 	createQuizValidator,
@@ -16,4 +20,5 @@ router.post(
 	createQuestions
 );
 
+router.get("/:id", protect, getQuiz);
 export default router;
