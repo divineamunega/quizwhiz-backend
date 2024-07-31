@@ -106,7 +106,9 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 	}
 
 	// Assign the user to a user property on the req object
+	const capitalizedName = user.name[0].toUpperCase() + user.name.slice(1);
 	req.user = user;
+	req.user.name = capitalizedName;
 
 	// Free to pass on to the protected resource
 	next();
