@@ -4,6 +4,7 @@ import {
 	createQuiz,
 	getAllCreatedQuizzes,
 	getQuiz,
+	startLoby,
 } from "../controllers/QuizController";
 import { protect } from "../controllers/AuthController";
 import {
@@ -23,5 +24,5 @@ router.post(
 
 router.get("/:id", protect, getQuiz);
 router.get("/", protect, getAllCreatedQuizzes);
-
+router.patch("/:id", protect, startLoby);
 export default router;

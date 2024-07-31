@@ -2,6 +2,8 @@ import { Response, Request, NextFunction } from "express";
 import prisma from "../prisma";
 import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import AppError from "../errors/AppError";
+import { createUniqueJoinCode } from "../utils/createUniqueJoinCode";
+// import { socketServer } from "../server";
 
 // JUst testing random stuff
 const createQuiz = AsyncErrorHandler(async function (
@@ -134,5 +136,43 @@ const getAllCreatedQuizzes = AsyncErrorHandler(async (req, res, next) => {
 	});
 });
 
+const startLoby = AsyncErrorHandler(async (req, res, next) => {
+	const quizId = req.params.id;
+	const userId = req.user!.id;
+
+	const uniqueCode = await createUniqueJoinCode();
+
+	const quiz = await prisma.quiz.update({
+		where: { id: quizId, creator: { id: userId } },
+		data: { status: "LOBBY", joinCode: uniqueCode },
+	});
+
+	if (!quiz)
+		throw new AppError(
+			`Could not find any quiz with the id ${quizId} in ${
+				req.user!.name
+			}'s list of created quizes. Send a POST request to /quiz to create one.`,
+			404
+		);
+
+	// const room = socketServer.
+	res.status(201).json({
+		status: "success",
+		message: "Your quiz is ready to be joined",
+		data: {
+			id: quiz.id,
+			name: quiz.name,
+			description: quiz.description,
+			joinCode: quiz.joinCode,
+		},
+	});
+});
+
 // https://quizwhiz-backend.onrender.com
-export { createQuiz, createQuestions, getQuiz, getAllCreatedQuizzes };
+export {
+	createQuiz,
+	createQuestions,
+	getQuiz,
+	getAllCreatedQuizzes,
+	startLoby,
+};
