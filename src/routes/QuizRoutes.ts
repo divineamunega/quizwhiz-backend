@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
 	createQuestions,
 	createQuiz,
+	getAllCreatedQuizzes,
 	getQuiz,
 } from "../controllers/QuizController";
 import { protect } from "../controllers/AuthController";
@@ -21,4 +22,6 @@ router.post(
 );
 
 router.get("/:id", protect, getQuiz);
+router.get("/", protect, getAllCreatedQuizzes);
+
 export default router;

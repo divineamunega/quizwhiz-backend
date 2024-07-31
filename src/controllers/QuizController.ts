@@ -113,5 +113,26 @@ const getQuiz = AsyncErrorHandler(async (req, res, next) => {
 	});
 });
 
+const getAllCreatedQuizzes = AsyncErrorHandler(async (req, res, next) => {
+	const userId = req.user?.id;
+
+	const quizes = await prisma.quiz.findMany({
+		where: { creator: { id: userId } },
+	});
+
+	if (quizes.length === 0)
+		throw new AppError(
+			`${req.user?.name} has not created any quizzes. 😥 send a POST request on /quiz to create one`,
+			404
+		);
+
+	res.status(200).json({
+		status: "success",
+		data: {
+			quizes: quizes,
+		},
+	});
+});
+
 // https://quizwhiz-backend.onrender.com
-export { createQuiz, createQuestions, getQuiz };
+export { createQuiz, createQuestions, getQuiz, getAllCreatedQuizzes };
