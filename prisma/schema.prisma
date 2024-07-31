@@ -52,5 +52,5 @@ model Answer {
 enum QuizStatus {
   IDLE
   PROGRESS
-  COMPLETED
+  LOBBY
 }
