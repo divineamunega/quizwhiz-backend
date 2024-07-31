@@ -27,8 +27,9 @@ model Quiz {
   creator     User         @relation(fields: [creatorId], references: [id], name: "CreatedQuizzes")
   questions   Question[]
   status      QuizStatus
-  numberOfQuestions Int @default(0)
+  numberOfQuestions Int  @default(0)
   createdAt   DateTime     @default(now())
+  joinCode   String      @default("")
 }
 
 model Question {
