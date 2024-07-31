@@ -122,7 +122,7 @@ const getAllCreatedQuizzes = AsyncErrorHandler(async (req, res, next) => {
 
 	if (quizes.length === 0)
 		throw new AppError(
-			`${req.user?.name} has not created any quizzes. 😥 send a POST request on /quiz to create one`,
+			`${req.user?.name} has not created any quizzes. 😥 send a POST request to /quiz to create one`,
 			404
 		);
 
