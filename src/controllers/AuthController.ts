@@ -4,6 +4,8 @@ import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import { signToken } from "../utils/jwt";
 import AppError from "../errors/AppError";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { User } from "@prisma/client";
+import { CookieOptions, Response } from "express";
 
 // Signup function
 const signup = AsyncErrorHandler(async (req, res, next) => {
@@ -22,21 +24,7 @@ const signup = AsyncErrorHandler(async (req, res, next) => {
 		},
 	});
 
-	// Generate a JSON Web Token for the new user
-	const token = signToken(newUser.id);
-
-	// Send back the user data and JWT to the client
-	res.status(201).json({
-		status: "success",
-		data: {
-			token,
-			user: {
-				id: newUser.id,
-				name: newUser.name,
-				email: newUser.email,
-			},
-		},
-	});
+	createSendToken(newUser, 201, res);
 });
 
 // Login function
@@ -60,26 +48,17 @@ const login = AsyncErrorHandler(async (req, res, next) => {
 		throw new AppError("Authentication Error", 401, null, "login_error");
 	}
 
-	// Generate a JSON Web Token for the user
-	const token = signToken(user.id);
-
-	// Send back the user data and JWT to the client
-	res.status(200).json({
-		status: "success",
-		data: {
-			token,
-			user: {
-				id: user!.id,
-				name: user!.name,
-				email: user!.email,
-			},
-		},
-	});
+	// Generate a JSON Web Token for the user as a http only cookie
+	createSendToken(user, 200, res);
 });
 
 const protect = AsyncErrorHandler(async (req, res, next) => {
 	// Get token from header
-	const token = req.headers.authorization?.split(" ")[1];
+	// const token = req.headers.authorization?.split(" ")[1];
+
+	// Get cookie from cookie
+	const token = req.cookies.jwt;
+
 	if (!token)
 		throw new AppError(
 			"Your token is invalid. Please login again to get another token.",
@@ -115,25 +94,26 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 });
 
 // TODO LATERRRR
-/* 
-const createSendToken = (user, statusCode, res) => {
+
+const createSendToken = (user: User, statusCode: number, res: Response) => {
+	// Create Signed JWT token
 	const token = signToken(user.id);
 
+	// Create an http only cookie to be sent after successfull signin
 	const cookieOptions = {
 		expires: new Date(
-			Date.now() + process.env.JWT_COOKIE_EXPIRES_IN! * 24 * 60 * 60 * 1000
+			Date.now() + +process.env.JWT_COOKIE_EXPIRES_IN! * 24 * 60 * 60 * 1000
 		),
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production", // Cookie will be sent only over HTTPS
+		secure: process.env.ENVIROMENT === "production", // Cookie will be sent only over HTTPS
 		sameSite: "none", // Necessary for cross-domain cookies
-	};
+	} as CookieOptions;
 
 	res.cookie("jwt", token, cookieOptions);
 
 	res.status(statusCode).json({
 		status: "success",
 		data: {
-			token,
 			user: {
 				id: user.id,
 				name: user.name,
@@ -142,6 +122,5 @@ const createSendToken = (user, statusCode, res) => {
 		},
 	});
 };
-*/
 
 export { signup, login, protect };

@@ -4,6 +4,7 @@ import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import AppError from "../errors/AppError";
 import { createUniqueJoinCode } from "../utils/createUniqueJoinCode";
 // import { socketServer } from "../server";
+// import { socketServer } from "../server";
 
 // JUst testing random stuff
 const createQuiz = AsyncErrorHandler(async function (
@@ -155,7 +156,6 @@ const startLoby = AsyncErrorHandler(async (req, res, next) => {
 			404
 		);
 
-	// const room = socketServer.
 	res.status(201).json({
 		status: "success",
 		message: "Your quiz is ready to be joined",

@@ -5,10 +5,13 @@ import AuthRoute from "./routes/AuthRoutes";
 import AppError from "./errors/AppError";
 import morgan from "morgan";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
 
 const app = express();
 
+// Special Middlewares
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
