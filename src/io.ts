@@ -3,7 +3,7 @@ import { Server as nodeServer } from "node:http";
 const initSocket = function (server: nodeServer) {
 	return new Server(server, {
 		cors: {
-			origin: "*",
+			origin: "http://localhost:5173",
 		},
 	});
 };

@@ -12,7 +12,21 @@ const app = express();
 
 // Special Middlewares
 app.use(cookieParser());
-app.use(cors());
+app.use(
+	cors({
+		origin: "http://localhost:5173",
+		credentials: true,
+		optionsSuccessStatus: 200,
+	})
+);
+app.options(
+	"*",
+	cors({
+		origin: "http://localhost:5173",
+		credentials: true,
+		optionsSuccessStatus: 200,
+	})
+);
 app.use(express.json());
 app.use(morgan("tiny"));
 

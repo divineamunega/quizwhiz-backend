@@ -105,7 +105,7 @@ const createSendToken = (user: User, statusCode: number, res: Response) => {
 			Date.now() + +process.env.JWT_COOKIE_EXPIRES_IN! * 24 * 60 * 60 * 1000
 		),
 		httpOnly: true,
-		secure: process.env.ENVIROMENT === "production", // Cookie will be sent only over HTTPS
+		secure: process.env.ENVIROMENT === "development", // Cookie will be sent only over HTTPS
 		sameSite: "none", // Necessary for cross-domain cookies
 	} as CookieOptions;
 

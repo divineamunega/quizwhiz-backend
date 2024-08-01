@@ -20,7 +20,7 @@ socketServer.of("/lobby").on("connect", (socket) => {
 	console.log("Connected");
 
 	socket.on("create", function (room) {
-		console.log("A user joined a room");
+		console.log(`A quiz lobby is on the way 🔥 ${room.joinCode}`);
 		console.log(room);
 		socket.join(room.joinCode);
 		// socket.emit("joined", room.name);
