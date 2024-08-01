@@ -17,6 +17,7 @@ app.use(
 		origin: "http://localhost:5173",
 		credentials: true,
 		optionsSuccessStatus: 200,
+		methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
 	})
 );
 app.options(
@@ -25,6 +26,7 @@ app.options(
 		origin: "http://localhost:5173",
 		credentials: true,
 		optionsSuccessStatus: 200,
+		methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
 	})
 );
 app.use(express.json());

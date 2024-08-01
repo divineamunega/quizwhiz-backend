@@ -58,6 +58,7 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 
 	// Get cookie from cookie
 	const token = req.cookies.jwt;
+	console.log(req.cookies.jwt);
 
 	if (!token)
 		throw new AppError(
@@ -123,4 +124,10 @@ const createSendToken = (user: User, statusCode: number, res: Response) => {
 	});
 };
 
-export { signup, login, protect };
+const loggedIn = AsyncErrorHandler(async (req, res) => {
+	res
+		.status(200)
+		.json({ status: "success", message: "Hello You are logged in" });
+});
+
+export { signup, login, protect, loggedIn };
