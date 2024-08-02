@@ -37,14 +37,17 @@ const login = AsyncErrorHandler(async (req, res, next) => {
 
 	// If user does not exist, throw an authentication error
 	if (!user) {
+		deleteCookie(res);
 		throw new AppError("Authentication Error", 401, null, "login_error");
 	}
 
 	// Check if the provided password matches the stored hashed password
 	const isCorrect = await bycrypt.compare(password, user!.password);
 
+	console.log(isCorrect);
 	// If password is incorrect, throw an authentication error
 	if (!isCorrect) {
+		deleteCookie(res);
 		throw new AppError("Authentication Error", 401, null, "login_error");
 	}
 
@@ -58,11 +61,10 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 
 	// Get cookie from cookie
 	const token = req.cookies.jwt;
-	console.log(req.cookies.jwt);
 
 	if (!token)
 		throw new AppError(
-			"Your token is invalid. Please login again to get another token.",
+			"Please input a token to access this route.",
 			401,
 			null,
 			"invalid_token"
@@ -106,7 +108,7 @@ const createSendToken = (user: User, statusCode: number, res: Response) => {
 			Date.now() + +process.env.JWT_COOKIE_EXPIRES_IN! * 24 * 60 * 60 * 1000
 		),
 		httpOnly: true,
-		secure: process.env.ENVIROMENT === "development", // Cookie will be sent only over HTTPS
+		secure: process.env.ENVIROMENT === "production", // Cookie will be sent only over HTTPS
 		sameSite: "none", // Necessary for cross-domain cookies
 	} as CookieOptions;
 
@@ -125,9 +127,20 @@ const createSendToken = (user: User, statusCode: number, res: Response) => {
 };
 
 const loggedIn = AsyncErrorHandler(async (req, res) => {
-	res
-		.status(200)
-		.json({ status: "success", message: "Hello You are logged in" });
+	res.status(200).json({
+		status: "success",
+		message: "Hello You are logged in",
+		data: req.user,
+	});
 });
+
+const deleteCookie = (res: Response) => {
+	res.cookie("jwt", "", {
+		httpOnly: true,
+		secure: process.env.ENVIROMENT === "production",
+		sameSite: "none",
+		expires: new Date(0),
+	});
+};
 
 export { signup, login, protect, loggedIn };
