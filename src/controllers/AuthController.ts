@@ -131,7 +131,7 @@ const loggedIn = AsyncErrorHandler(async (req, res) => {
 	res.status(200).json({
 		status: "success",
 		message: "Hello You are logged in",
-		data: req.user,
+		data: { ...req.user, password: undefined },
 	});
 });
 

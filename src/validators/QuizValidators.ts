@@ -3,8 +3,11 @@ import { handleData } from "./handleRequestBody";
 
 const createQuizValidator = function () {
 	return [
-		body("name").exists().withMessage("A quiz must have a name"),
-		body("description").exists().withMessage("A quiz must have a description"),
+		body("name").exists().notEmpty().withMessage("A quiz must have a name"),
+		body("description")
+			.exists()
+			.notEmpty()
+			.withMessage("A quiz must have a description"),
 		handleData,
 	];
 };
