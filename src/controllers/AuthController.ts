@@ -6,7 +6,6 @@ import AppError from "../errors/AppError";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
 import { CookieOptions, Response } from "express";
-
 // Signup function
 const signup = AsyncErrorHandler(async (req, res, next) => {
 	// Extract name, email, and password from the validated request data
@@ -61,7 +60,7 @@ const protect = AsyncErrorHandler(async (req, res, next) => {
 
 	// Get cookie from cookie
 	const token = req.cookies.jwt;
-	console.log(token);
+	console.log("TOKEN", token);
 	if (!token)
 		throw new AppError(
 			"Please input a token to access this route.",

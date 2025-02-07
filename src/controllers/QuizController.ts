@@ -1,4 +1,4 @@
-import { Response, Request, NextFunction } from "express";
+import { Response, Request } from "express";
 import prisma from "../prisma";
 import AsyncErrorHandler from "../errors/AsyncErrorHandler";
 import AppError from "../errors/AppError";
@@ -9,14 +9,20 @@ import { createUniqueJoinCode } from "../utils/createUniqueJoinCode";
 // JUst testing random stuff
 const createQuiz = AsyncErrorHandler(async function (
 	req: Request,
-	res: Response,
-	next: NextFunction
+	res: Response
 ) {
-	const { name: quizName, description: quizDescription } = req.data;
+	const {
+		name: quizName,
+		description: quizDescription,
+		tags,
+		visibility,
+	} = req.data;
 	const quiz = await prisma.quiz.create({
 		data: {
 			name: quizName,
 			description: quizDescription,
+			tags,
+			visibility,
 			status: "IDLE",
 			creatorId: req.user!.id,
 		},
@@ -85,35 +91,32 @@ const createQuestions = AsyncErrorHandler(async (req, res, next) => {
 });
 
 const getQuiz = AsyncErrorHandler(async (req, res, next) => {
-	const quizId = req.params.id;
-	const userId = req.user!.id;
-
-	const quiz = await prisma.quiz.findFirst({
-		where: { id: quizId, creator: { id: userId } },
-	});
-
-	if (!quiz)
-		throw new AppError(
-			`Could not find any quiz with the id ${quizId} in ${
-				req.user?.name[0].toUpperCase() + req.user!.name.slice(1)
-			}'s list of created quizes.`,
-			404
-		);
-
-	const questions = await prisma.question.findMany({ where: { quiz: quiz } });
-	res.status(200).json({
-		status: "success",
-		data: {
-			quiz: {
-				name: quiz.name,
-				description: quiz.description,
-				numberOfQuestions: questions.length,
-				questions: questions.map((question) => {
-					return { id: question.id, question: question.question };
-				}),
-			},
-		},
-	});
+	// const quizId = req.params.id;
+	// const userId = req.user!.id;
+	// const quiz = await prisma.quiz.findFirst({
+	// 	where: { id: quizId, creator: { id: userId } },
+	// });
+	// if (!quiz)
+	// 	throw new AppError(
+	// 		`Could not find any quiz with the id ${quizId} in ${
+	// 			req.user?.name[0].toUpperCase() + req.user!.name.slice(1)
+	// 		}'s list of created quizes.`,
+	// 		404
+	// 	);
+	// const questions = await prisma.question.findMany({ where: { quiz: quiz } });
+	// res.status(200).json({
+	// 	status: "success",
+	// 	data: {
+	// 		quiz: {
+	// 			name: quiz.name,
+	// 			description: quiz.description,
+	// 			numberOfQuestions: questions.length,
+	// 			questions: questions.map((question) => {
+	// 				return { id: question.id, question: question.question };
+	// 			}),
+	// 		},
+	// 	},
+	// });
 });
 
 const getAllCreatedQuizzes = AsyncErrorHandler(async (req, res, next) => {

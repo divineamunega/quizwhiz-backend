@@ -7,11 +7,12 @@ import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
-
+import session from "express-session";
+import passport from "passport";
 const app = express();
-
-// Special Middlewares
 app.use(cookieParser());
+app.use(express.json());
+app.use(morgan("tiny"));
 app.use(
 	cors({
 		origin: "http://localhost:5173",
@@ -29,8 +30,18 @@ app.options(
 		methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
 	})
 );
-app.use(express.json());
-app.use(morgan("tiny"));
+
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET + "",
+		resave: false,
+		saveUninitialized: true,
+	})
+);
+
+app.use(passport.initialize());
+app.use(passport.authenticate("session"));
+app.use(passport.session());
 
 app.use("/api/v1/quiz", QuizRoute);
 app.use("/api/v1/auth", AuthRoute);
@@ -42,6 +53,7 @@ app.get("/api/cron", (req: Request, res: Response) => {
 		message: "Hello to the cronjob.",
 	});
 });
+
 app.use("*", (req: Request, res: Response) => {
 	res.status(404).json({
 		status: "fail",
@@ -59,7 +71,8 @@ app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 		return;
 	}
 
-	if ((process.env.ENVIROMENT = "DEVELOPMENT")) {
+	if (process.env.ENVIROMENT === "DEVELOPMENT") {
+		console.log(error);
 		formatedErr = handleErrorDev(error);
 		res.status(formatedErr.statusCode || 500).json(formatedErr);
 		return;
