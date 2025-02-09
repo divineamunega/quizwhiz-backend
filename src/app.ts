@@ -8,7 +8,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
 import session from "express-session";
-import passport from "passport";
+import passport from "./passport";
+
 const app = express();
 app.use(cookieParser());
 app.use(express.json());

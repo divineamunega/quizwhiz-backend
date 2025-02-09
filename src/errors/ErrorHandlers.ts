@@ -5,6 +5,7 @@
  * @returns A standardized error response
  */
 const handleErrorProd = (err: any) => {
+	console.log("err", err);
 	// Handle validation errors specifically
 	if (err.type === "express_validator") {
 		const errorMessages = err.errorObj?.map((obj: any) => obj.msg).join(", ");

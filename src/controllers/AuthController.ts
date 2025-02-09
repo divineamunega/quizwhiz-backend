@@ -6,6 +6,45 @@ import AppError from "../errors/AppError";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
 import { CookieOptions, Response } from "express";
+
+// This is a callback function from passport
+
+const verifyGoogle = async (
+	_accessToken: string,
+	_refreshToken: string,
+	profile: any,
+	callback: any
+) => {
+	try {
+		console.log("profile", profile);
+		const name = profile.name.givenName;
+		const email = profile.emails[0].value;
+		const googleId = profile.id;
+		console.log(name, email, googleId);
+
+		// Find or create user
+		let user = await prisma.user.findFirst({
+			where: {
+				googleId,
+			},
+		});
+
+		if (!user) {
+			user = await prisma.user.create({
+				data: {
+					email,
+					name,
+					googleId,
+				},
+			});
+		}
+
+		return callback(null, profile.id);
+	} catch (err) {
+		callback(err);
+	}
+};
+
 // Signup function
 const signup = AsyncErrorHandler(async (req, res, next) => {
 	// Extract name, email, and password from the validated request data
@@ -41,7 +80,7 @@ const login = AsyncErrorHandler(async (req, res, next) => {
 	}
 
 	// Check if the provided password matches the stored hashed password
-	const isCorrect = await bycrypt.compare(password, user!.password);
+	const isCorrect = await bycrypt.compare(password, user.password ?? "");
 
 	console.log(isCorrect);
 	// If password is incorrect, throw an authentication error
@@ -143,4 +182,4 @@ const deleteCookie = (res: Response) => {
 	});
 };
 
-export { signup, login, protect, loggedIn };
+export { signup, login, protect, loggedIn, verifyGoogle };
