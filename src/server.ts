@@ -3,9 +3,9 @@ import app from "./app";
 import { createServer } from "node:http";
 import initSocket from "./io";
 
-configDotenv({ path: "./env" });
+configDotenv({ path: "./.env" });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const server = createServer(app);
 const socketServer = initSocket(server);
