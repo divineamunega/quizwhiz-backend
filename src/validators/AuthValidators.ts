@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { handleData, handleLoginData } from "./handleRequestBody";
+import { handleData, handleLoginData } from "@/middlewares";
 import { body } from "express-validator";
 // Extend the Request interface to include a 'data' property
 declare module "express-serve-static-core" {

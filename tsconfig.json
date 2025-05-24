@@ -1,11 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "es6",
+		"target": "ESNext",
 		"module": "commonjs",
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"strict": true,
 		"esModuleInterop": true,
-		"noUnusedLocals": true
-	}
+		"noUnusedLocals": true,
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["src/*"]
+		}
+	},
+	"include": ["src"],
+	"exclude": ["node_modules"]
 }

@@ -28,7 +28,8 @@
 		"@types/morgan": "^1.9.9",
 		"@types/passport-google-oauth20": "^2.0.16",
 		"nodemon": "^3.1.4",
-		"typescript": "^5.5.4"
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.8.3"
 	},
 	"dependencies": {
 		"@prisma/client": "^6.2.1",
@@ -40,11 +41,15 @@
 		"express-session": "^1.18.1",
 		"express-validator": "^7.1.0",
 		"jsonwebtoken": "^9.0.2",
+		"module-alias": "^2.2.3",
 		"morgan": "^1.10.0",
 		"passport": "^0.7.0",
 		"passport-google-oauth20": "^2.0.0",
 		"prisma": "^6.2.1",
 		"socket.io": "^4.7.5",
 		"ts-node": "^10.9.2"
+	},
+	"_moduleAliases": {
+		"@": "src"
 	}
 }

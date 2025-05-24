@@ -2,7 +2,7 @@
  * AppError extends the built-in Error class to include additional properties
  * for handling operational errors in a more structured way.
  */
-export default class AppError extends Error {
+export class AppError extends Error {
 	public statusCode: number;
 	public isOperational: boolean;
 	public status: string;

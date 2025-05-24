@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { handleData } from "./handleRequestBody";
+import { handleData } from "@/middlewares";
 
 const createQuizValidator = function () {
 	return [
@@ -12,7 +12,7 @@ const createQuizValidator = function () {
 	];
 };
 
-const createQuestionValidator = function () {
+const addQuestionValidator = function () {
 	return [
 		body("question")
 			.exists()
@@ -48,4 +48,4 @@ const createQuestionValidator = function () {
 	];
 };
 
-export { createQuizValidator, createQuestionValidator };
+export { createQuizValidator, addQuestionValidator };

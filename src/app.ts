@@ -1,14 +1,14 @@
 import { Response, Request, NextFunction } from "express";
 import express from "express";
-import QuizRoute from "./routes/QuizRoutes";
-import AuthRoute from "./routes/AuthRoutes";
-import AppError from "./errors/AppError";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { handleErrorDev, handleErrorProd } from "./errors/ErrorHandlers";
 import session from "express-session";
-import passport from "./passport";
+
+import { authRouter } from "@/routes";
+import { quizRouter } from "@/routes";
+import { AppError } from "@/errors";
+import { handleErrorDev, handleErrorProd } from "@/errors";
 
 const app = express();
 app.use(cookieParser());
@@ -40,21 +40,15 @@ app.use(
 	})
 );
 
-app.use(passport.initialize());
-app.use(passport.authenticate("session"));
-app.use(passport.session());
+/**
+ *  Routes
+ */
+app.use("/api/v1/quiz", quizRouter);
+app.use("/api/v1/auth", authRouter);
 
-app.use("/api/v1/quiz", QuizRoute);
-app.use("/api/v1/auth", AuthRoute);
-
-app.get("/api/cron", (req: Request, res: Response) => {
-	console.log("CRON REQUEST");
-	res.status(200).json({
-		status: "success",
-		message: "Hello to the cronjob.",
-	});
-});
-
+/**
+ * Wildcard for unkown routes
+ *  */
 app.use("*", (req: Request, res: Response) => {
 	res.status(404).json({
 		status: "fail",
@@ -65,22 +59,24 @@ app.use("*", (req: Request, res: Response) => {
 app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 	let formatedErr;
 
-	if (process.env.ENVIROMENT === "PRODUCTION") {
+	if (process.env.NODE_ENV === "production") {
 		formatedErr = handleErrorProd(error);
 		const { statusCode, ...remainingFormatedErr } = formatedErr;
 		res.status(statusCode).json(remainingFormatedErr);
 		return;
 	}
 
-	if (process.env.ENVIROMENT === "DEVELOPMENT") {
+	if (process.env.NODE_ENV === "development") {
 		console.log(error);
 		formatedErr = handleErrorDev(error);
 		res.status(formatedErr.statusCode || 500).json(formatedErr);
 		return;
 	}
+
+	// Fallback for other NODE_ENV values (test, staging, etc)
+	res.status(500).json({
+		status: "error",
+		message: "Unexpected environment. Internal server error.",
+	});
 });
 export default app;
-
-// Create Quizes
-// Get Quizes
-// Authentication.... (Bare bone Just sign up, login and authorization with protect)

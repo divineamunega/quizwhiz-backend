@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { matchedData, validationResult } from "express-validator";
-import AppError from "../errors/AppError";
+import { AppError } from "@/errors";
 
 /**
  * Middleware to handle validation errors and extract validated data.
@@ -28,6 +28,7 @@ const handleLoginData = function (
 	res: Response,
 	next: NextFunction
 ) {
+	console.log("Login Errors");
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		// Pass validation errors to the next middleware (error handler)

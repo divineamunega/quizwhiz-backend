@@ -14,10 +14,8 @@ type AsyncRequestHandler = (
  * @param fn - An asynchronous middleware function
  * @returns A new middleware function that handles errors
  */
-const AsyncErrorHandler = (fn: AsyncRequestHandler): RequestHandler => {
+export const AsyncErrorHandler = (fn: AsyncRequestHandler): RequestHandler => {
 	return (req: Request, res: Response, next: NextFunction) => {
 		fn(req, res, next).catch(next); // Simplified error handling
 	};
 };
-
-export default AsyncErrorHandler;
