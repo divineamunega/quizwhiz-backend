@@ -2,6 +2,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// This schema defines the data model for a quiz application using Prisma.
+// It includes models for User, Quiz, Question, Answer, and RefreshToken.
 
 datasource db {
   provider  = "postgresql"

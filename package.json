@@ -4,11 +4,11 @@
 	"description": "The backend repo for a quiz app",
 	"main": "src/server.ts",
 	"scripts": {
-		"start": "env-cmd -f .env.prod node dist/server.js",
-		"dev": "env-cmd -f .env.prod nodemon src/server.ts",
+		"start": "dotenv -e .env.prod node dist/server.js",
+		"dev": "dotenv -e .env.local nodemon src/server.ts",
 		"build": "tsc",
-		"migrate:dev": "env-cmd -f .env npx prisma migrate dev",
-		"migrate:prod": "env-cmd -f .env.prod npx prisma migrate deploy",
+		"migrate:dev": "dotenv -e .env.local --  npx prisma migrate dev",
+		"migrate:prod": "dotenv -e .env.prod -- npx prisma migrate deploy",
 		"prisma:generate": "npx prisma generate"
 	},
 	"keywords": [
@@ -31,6 +31,7 @@
 		"@types/morgan": "^1.9.9",
 		"@types/ms": "^2.1.0",
 		"@types/passport-google-oauth20": "^2.0.16",
+		"dotenv-cli": "^8.0.0",
 		"env-cmd": "^10.1.0",
 		"nodemon": "^3.1.4",
 		"prisma": "^6.8.2",
@@ -56,6 +57,6 @@
 		"ts-node": "^10.9.2"
 	},
 	"_moduleAliases": {
-		"@": "src"
+		"@": "dist"
 	}
 }
