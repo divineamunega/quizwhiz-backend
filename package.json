@@ -4,11 +4,11 @@
 	"description": "The backend repo for a quiz app",
 	"main": "src/server.ts",
 	"scripts": {
-		"start": "env-cmd -f .env.production node dist/server.js",
-		"dev": "env-cmd -f .env nodemon src/server.ts",
+		"start": "env-cmd -f .env.prod node dist/server.js",
+		"dev": "env-cmd -f .env.prod nodemon src/server.ts",
 		"build": "tsc",
 		"migrate:dev": "env-cmd -f .env npx prisma migrate dev",
-		"migrate:prod": "env-cmd -f .env.production npx prisma migrate deploy",
+		"migrate:prod": "env-cmd -f .env.prod npx prisma migrate deploy",
 		"prisma:generate": "npx prisma generate"
 	},
 	"keywords": [
