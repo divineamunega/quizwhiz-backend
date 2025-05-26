@@ -27,6 +27,7 @@ const signupValidator = () => [
 		.exists()
 		.withMessage("A user must have an email")
 		.trim()
+		.normalizeEmail()
 		.isEmail()
 		.withMessage("Please provide a valid email"),
 	body("password")
