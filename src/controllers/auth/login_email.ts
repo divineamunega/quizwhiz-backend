@@ -18,7 +18,7 @@ if (
 	!accessExpiresIn ||
 	!refreshSecret ||
 	!refreshTokenExpiresIn ||
-	environment
+	!environment
 ) {
 	throw new AppError("Invalid enviroment variables", 500);
 }
