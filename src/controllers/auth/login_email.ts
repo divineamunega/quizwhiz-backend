@@ -28,7 +28,7 @@ export const login = AsyncErrorHandler(async (req, res, next) => {
 	const { email, password } = req.data;
 
 	// Find the user by email in the database
-	const user = await prisma.user.findFirst({ where: { email } });
+	const user = await prisma.user.findUnique({ where: { email } });
 
 	// If user does not exist, throw an authentication error
 	if (!user) {
@@ -69,7 +69,7 @@ export const login = AsyncErrorHandler(async (req, res, next) => {
 	res.cookie("_rt", refreshToken, {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
-		sameSite: "strict",
+		sameSite: "lax",
 		secure: environment === "production",
 		path: "/",
 	});
