@@ -71,7 +71,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	});
 
 	// Send response
-	res.status(200).json({
+	res.status(201).json({
 		message: "success",
 		accessToken: accessToken,
 
@@ -79,7 +79,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 			id: newUser.id,
 			name: newUser.name,
 			email: newUser.email,
-			avatar: newUser.avatar,
+			avatar: newUser.avatar ? newUser.avatar : undefined,
 		},
 	});
 });
