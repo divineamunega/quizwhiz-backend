@@ -1,9 +1,9 @@
 import bycrypt from "bcryptjs";
+import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import ms, { StringValue } from "ms";
-
 import { AsyncErrorHandler } from "@/middlewares";
-import { prisma } from "@/lib";
+import { prisma, renderVerifyCodeTemplate, sendEmail } from "@/lib";
 import { AppError } from "@/errors";
 
 const environment = process.env.NODE_ENV;
@@ -69,6 +69,19 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 		secure: environment === "production",
 		path: "/",
 	});
+
+	// Send Random 6 digit code
+	const randomCode = crypto.randomBytes(3).toString("hex");
+	console.log(randomCode);
+
+	console.log("sending email");
+
+	await sendEmail({
+		to: newUser.email,
+		subject: "Verification Code",
+		html: renderVerifyCodeTemplate(randomCode, newUser.name),
+	});
+	console.log("sent email");
 
 	// Send response
 	res.status(201).json({

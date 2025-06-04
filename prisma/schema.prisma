@@ -36,6 +36,8 @@ model RefreshToken {
   value     String   @unique // Hashed refresh token string
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  isEmailVerified Boolean @default(false) // Indicates if the email is verified
+  isGoogleVerified Boolean @default(false) // Indicates if the Google account is verified
   createdAt DateTime @default(now())
   expiresAt DateTime
   ipAddress String? // For auditing/login location
