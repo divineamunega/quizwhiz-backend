@@ -30,10 +30,8 @@ export const sendEmail = async function ({
 
 	const result = await resend.emails.send({ from, to, html, subject });
 
-	console.log(result);
-
 	if (result.error) {
 		console.log(result);
-		throw new Error("Error while sending email");
+		console.log("Error while sending email");
 	}
 };
