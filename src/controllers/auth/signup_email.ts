@@ -72,7 +72,18 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 
 	// Send Random 6 digit code
 	const randomCode = crypto.randomBytes(3).toString("hex");
-	console.log(randomCode);
+	const hashedCode = await bycrypt.hash(randomCode, 12);
+
+	// Todo create a webhook or dont use await  for it
+
+	await prisma.verificationCode.create({
+		data: {
+			hashedCode,
+			userId: newUser.id,
+			expiresAt: new Date(Date.now() + ms("10m")),
+			type: "EMAIL",
+		},
+	});
 
 	console.log("sending email");
 

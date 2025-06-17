@@ -1,14 +1,58 @@
+import { isAfter } from "date-fns";
+import { AppError } from "@/errors";
+import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
+import { compare } from "bcryptjs";
 
-import crypto from "node:crypto";
-
-console.log(parseInt(crypto.randomBytes(3).toString("hex"), 16));
 const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
-	// Get the users email,
-	// generate a  random 6 digit code or provide a link (What is the better UX)
-	// hash and save the code in database? (or suggest the best way to do it)
-	// Confirm code
-	// SWucessfully verified
+	const userId = req.user?.id;
+	const code = req.query["code"] as string;
+
+	if (!userId || !code) {
+		// 400 Bad Request – missing required input
+		throw new AppError("Missing user ID or verification code.", 400);
+	}
+
+	const verifyCode = await prisma.verificationCode.findFirst({
+		where: { userId, isUsed: false, type: "EMAIL" },
+		orderBy: { createdAt: "desc" },
+	});
+
+	if (!verifyCode) {
+		// 404 Not Found – no active verification code exists
+		throw new AppError(
+			"No active verification code found. Please request a new one.",
+			404
+		);
+	}
+
+	if (isAfter(new Date(), verifyCode.expiresAt)) {
+		// 410 Gone – resource existed but is no longer valid
+		throw new AppError(
+			"This verification code has expired. Please request a new one.",
+			410
+		);
+	}
+
+	const isCorrect = await compare(code, verifyCode.hashedCode);
+
+	if (!isCorrect) {
+		// 401 Unauthorized – invalid or failed authentication
+		throw new AppError(
+			"Invalid verification code. Please check the code and try again.",
+			401
+		);
+	}
+
+	await prisma.verificationCode.update({
+		where: { id: verifyCode.id },
+		data: { isUsed: true },
+	});
+
+	res.status(200).json({
+		status: "success",
+		message: `User ${userId} email verified successfully.`,
+	});
 });
 
 export { verifyEmail };
