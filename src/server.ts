@@ -1,8 +1,11 @@
-import "module-alias/register";
+// import "module-alias/register";
+
+if (process.env.NODE_ENV === "production") {
+	require("module-alias/register");
+}
+
 import app from "./app";
 import { createServer } from "node:http";
-// @ts-ignore
-import module from "module-alias/register";
 
 const PORT = process.env.PORT || 4000;
 

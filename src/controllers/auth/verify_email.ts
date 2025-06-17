@@ -6,6 +6,7 @@ import { compare } from "bcryptjs";
 
 const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	const userId = req.user?.id;
+
 	const code = req.query["code"] as string;
 
 	if (!userId || !code) {
@@ -47,6 +48,11 @@ const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	await prisma.verificationCode.update({
 		where: { id: verifyCode.id },
 		data: { isUsed: true },
+	});
+
+	await prisma.user.update({
+		where: { id: userId },
+		data: { emailVerified: true },
 	});
 
 	res.status(200).json({

@@ -1,27 +1,35 @@
 import { AppError } from "@/errors";
+import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
-import jwt from "jsonwebtoken";
+import { verifyJWT } from "@/utils";
 
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN;
-
 if (!accessSecret) {
-	throw new AppError("Invalid Enviroment Credentials", 500);
+	throw new AppError("Missing ACCESS_TOKEN_SECRET environment variable.", 500);
 }
 
 const protect = AsyncErrorHandler(async function (req, res, next) {
-	const bearerString = req.headers["authorization"]?.split(" ");
+	const authHeader = req.headers["authorization"];
+	if (!authHeader?.startsWith("Bearer ")) {
+		return next(
+			new AppError("Authorization header missing or malformed.", 401)
+		);
+	}
 
-	if (bearerString?.at(0) !== "Bearer" || !bearerString.at(1))
-		return next(new AppError("Wrong Credentials", 401));
+	const accessToken = authHeader.split(" ")[1];
+	const payload = verifyJWT(accessToken, accessSecret) as {
+		id: string;
+		iat: number;
+		exp: number;
+	};
 
-	const accessToken = bearerString.at(1);
+	const user = await prisma.user.findUnique({ where: { id: payload.id } });
+	if (!user) {
+		return next(new AppError("User associated with token not found.", 404));
+	}
 
-	if (!accessToken) throw new AppError("Invalid Credentials", 400); // correct error codes and errors
-
-	const payload = jwt.verify(accessToken, accessSecret);
-	console.log(payload);
-	return;
+	req.user = user;
+	next();
 });
 
 export { protect };
