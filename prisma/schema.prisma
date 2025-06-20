@@ -75,7 +75,7 @@ model Quiz {
   creatorId           String
   image                 String?
   tags                    String[]
-  visibility           QuizVisibility
+  visibility           QuizVisibility @default(PUBLIC) 
   creator              User           @relation(fields: [creatorId], references: [id], name: "CreatedQuizzes")
   questions         Question[] @relation("QuizQuestions")
   createdAt         DateTime       @default(now())

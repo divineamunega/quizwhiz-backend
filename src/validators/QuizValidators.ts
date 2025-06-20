@@ -3,11 +3,21 @@ import { handleData } from "@/middlewares";
 
 const createQuizValidator = function () {
 	return [
-		body("name").exists().notEmpty().withMessage("A quiz must have a name"),
+		body("title").exists().notEmpty().withMessage("A quiz must have a title"),
 		body("description")
 			.exists()
 			.notEmpty()
 			.withMessage("A quiz must have a description"),
+
+		body("tags")
+			.optional()
+			.isArray()
+			.withMessage("Tags must be an array")
+			.custom((tags: any[]) =>
+				tags.every((tag) => typeof tag === "string" && tag.trim().length > 0)
+			)
+			.withMessage("Each tag must be a non-empty string"),
+
 		handleData,
 	];
 };
