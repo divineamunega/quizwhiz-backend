@@ -7,7 +7,7 @@ import { compare } from "bcryptjs";
 const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	const userId = req.user?.id;
 
-	const code = req.query["code"] as string;
+	const code = (req.query["code"] as string).trim();
 
 	if (!userId || !code) {
 		// 400 Bad Request – missing required input
