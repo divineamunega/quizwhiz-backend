@@ -1,0 +1,46 @@
+<!-- emailTemplates/verifyCode.html -->
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Email Verification</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background: #f4f4f4;
+				padding: 20px;
+				color: #333;
+			}
+			.container {
+				background: #ffffff;
+				padding: 30px;
+				border-radius: 8px;
+				max-width: 600px;
+				margin: auto;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+			}
+			.code {
+				font-size: 24px;
+				font-weight: bold;
+				color: #2c3e50;
+				letter-spacing: 4px;
+				margin-top: 20px;
+				background: #eef2f5;
+				padding: 10px 15px;
+				border-radius: 6px;
+				display: inline-block;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h2>Thank you for joining us at QuizWhizz 🎉 {{NAME}}</h2>
+			<p>To verify your email address, please use the code below:</p>
+			<div class="code">{{CODE}}</div>
+			<p>This code will expire in 10 minutes.</p>
+			<p>If you didn't request this, you can ignore this email.</p>
+			<p>— The QuizWhizz Team</p>
+		</div>
+	</body>
+</html>

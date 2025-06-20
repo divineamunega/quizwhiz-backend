@@ -1,4 +1,9 @@
-import "module-alias/register";
+// import "module-alias/register";
+
+if (process.env.NODE_ENV === "production") {
+	require("module-alias/register");
+}
+
 import app from "./app";
 import { createServer } from "node:http";
 

@@ -9,7 +9,7 @@
 		"noUnusedLocals": true,
 		"baseUrl": "./",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		},
 		"skipLibCheck": true
 	},
