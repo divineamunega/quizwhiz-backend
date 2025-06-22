@@ -1,6 +1,3 @@
-Here’s a **complete, well-structured README-style authentication guide** for your `QuizWhizz` backend, specifically for a **React + Axios + React Query** frontend engineer with little/no auth experience.
-
----
 
 # 🔐 QuizWhizz Authentication Guide for Frontend Engineers
 
