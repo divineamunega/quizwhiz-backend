@@ -22,40 +22,27 @@ const createQuizValidator = function () {
 	];
 };
 
-const addQuestionValidator = function () {
-	return [
-		body("question")
-			.exists()
-			.withMessage("A question must have a question field"),
-		body("answers")
-			.exists()
-			.withMessage("Each question must have an answer field")
-			.isArray({ min: 2 })
-			.bail()
-			.withMessage("Every question must have at least 2 answers")
-			.custom((value, { req }) => {
-				return Boolean(
-					req.body.answers?.some((obj: any) => {
-						return obj.isCorrect === true;
-					})
-				);
-			})
-			.withMessage("A question must have at least one correct answer"),
+const addQuestionValidator = () => [
+	body("text").exists().withMessage("A question must have a text field"),
 
-		body("answers.*.isCorrect")
-			.exists()
-			.withMessage("Every answer must have an isCorrect field ")
-			.bail()
-			.isBoolean()
-			.withMessage("iscorrect must be a boolean"),
+	body("answers")
+		.isArray({ min: 2 })
+		.withMessage("Every question must have at least 2 answers")
+		.custom(
+			(answers) =>
+				Array.isArray(answers) && answers.some((a) => a.isCorrect === true)
+		)
+		.withMessage("A question must have at least one correct answer"),
 
-		body("answers.*.answer")
-			.exists()
-			.withMessage("Every answer object must have an answer field")
-			.bail(),
+	body("answers.*.isCorrect")
+		.isBoolean()
+		.withMessage("isCorrect must be a boolean"),
 
-		handleData,
-	];
-};
+	body("answers.*.text")
+		.notEmpty()
+		.withMessage("Each answer must have a text field"),
+
+	handleData,
+];
 
 export { createQuizValidator, addQuestionValidator };

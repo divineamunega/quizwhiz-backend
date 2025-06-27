@@ -35,7 +35,7 @@
 		"dotenv-cli": "^8.0.0",
 		"env-cmd": "^10.1.0",
 		"nodemon": "^3.1.4",
-		"prisma": "^6.8.2",
+		"prisma": "^6.10.1",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.8.3"
 	},

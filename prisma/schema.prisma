@@ -115,25 +115,26 @@ model QuizParticipant {
 
 model Question {
   id        String   @id @default(uuid())
-  title     String
+  text     String
   image     String?
   createdAt DateTime @default(now())
   quizId    String
   quiz      Quiz     @relation(name: "QuizQuestions", fields: [quizId], references: [id])
   answers   Answer[] @relation("QuestionAnswers")
-  order     Int? 
+  position     Int?      // Order of the question in the quiz
 
-  @@unique([quizId, order])     // Ensures unique order per quiz
+  @@unique([quizId, position])     // Ensures unique order per quiz
 
 }
 
 model Answer {
   id         String    @id @default(uuid())
   isCorrect  Boolean
-  answer     String
+  text     String
   questionId String
   question   Question  @relation(name: "QuestionAnswers", fields: [questionId], references: [id])
-  order      Int?    
+  position   Int?
 
-  @@unique([questionId, order]) // Ensures unique order per question
+  @@unique([questionId, position]) // Ensures unique order per question
 }
+

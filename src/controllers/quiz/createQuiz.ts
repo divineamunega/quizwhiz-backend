@@ -12,7 +12,7 @@ export const createQuiz = AsyncErrorHandler(
 				creatorId: user.id,
 				title,
 				description,
-				tags: tags.length > 0 ? tags : [],
+				tags: tags && tags.length > 0 ? tags : [],
 			},
 		});
 
