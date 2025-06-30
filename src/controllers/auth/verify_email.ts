@@ -7,6 +7,10 @@ import { compare } from "bcryptjs";
 const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	const userId = req.user?.id;
 
+	const emailVerified = req.user?.emailVerified;
+
+	if (emailVerified) throw new AppError("Email Already verified", 409);
+
 	const code = (req.query["code"] as string).trim();
 
 	if (!userId || !code) {
