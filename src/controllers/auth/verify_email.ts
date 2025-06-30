@@ -7,15 +7,11 @@ import { compare } from "bcryptjs";
 const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	const userId = req.user?.id;
 
-	const emailVerified = req.user?.emailVerified;
-
-	if (emailVerified) throw new AppError("Email Already verified", 409);
-
 	const code = (req.query["code"] as string).trim();
 
-	if (!userId || !code) {
+	if (!code) {
 		// 400 Bad Request – missing required input
-		throw new AppError("Missing user ID or verification code.", 400);
+		throw new AppError("Missing verification code query param.", 400);
 	}
 
 	const verifyCode = await prisma.verificationCode.findFirst({
