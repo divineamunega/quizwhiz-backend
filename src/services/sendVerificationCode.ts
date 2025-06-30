@@ -5,6 +5,7 @@ import ms from "ms";
 
 export const sendVerificationCode = async function (user: User) {
 	try {
+		console.log("sending email");
 		const { rawCode, hashedCode } = await createRandomCode(6, true);
 
 		await prisma.verificationCode.create({
@@ -21,6 +22,7 @@ export const sendVerificationCode = async function (user: User) {
 			subject: "Verification Code",
 			html: renderVerifyCodeTemplate(rawCode, user.name),
 		});
+		console.log("sent email");
 	} catch (err) {
 		console.log("An error occured while sending Email");
 	}
