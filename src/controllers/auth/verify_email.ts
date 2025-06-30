@@ -36,7 +36,7 @@ const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	}
 
 	const isCorrect = await compare(code, verifyCode.hashedCode);
-
+	console.log(code, verifyCode.hashedCode);
 	if (!isCorrect) {
 		// 401 Unauthorized – invalid or failed authentication
 		throw new AppError(

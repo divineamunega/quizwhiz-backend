@@ -105,6 +105,6 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 
 	res.status(200).json({
 		status: "success",
-		data: { accessToken: newAccessToken },
+		accessToken: newAccessToken,
 	});
 });
