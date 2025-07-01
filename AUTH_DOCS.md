@@ -1,7 +1,3 @@
-Here’s a **complete, well-structured README-style authentication guide** for your `QuizWhizz` backend, specifically for a **React + Axios + React Query** frontend engineer with little/no auth experience.
-
----
-
 # 🔐 QuizWhizz Authentication Guide for Frontend Engineers
 
 > ✅ This guide explains how to authenticate users with the QuizWhizz backend API using **Axios**, **React Query**, and **cookies** securely.
@@ -62,6 +58,11 @@ https://quizwhiz-backend-1.onrender.com/api/v1/auth
 ### 5. **Email Verification**
 
 - `GET /verify_email?code=abc123`
+- Requires user to be authenticated (use access token)
+
+### 6. **Resend Email Verification**
+
+- `GET /resend-verfication`
 - Requires user to be authenticated (use access token)
 
 ---
@@ -154,6 +155,23 @@ GET /refresh
 ```http
 GET /verify_email?code=abc123
 Authorization: Bearer <accessToken>
+```
+
+---
+
+### 🔁 Resend Verification Email
+
+```http
+GET /resend-verfication
+Authorization: Bearer <accessToken>
+```
+
+**Response:**
+
+```json
+{
+	"message": "Verification Code Sent successfully"
+}
 ```
 
 ---
