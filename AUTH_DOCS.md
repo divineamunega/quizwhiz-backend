@@ -1,3 +1,4 @@
+
 # 🔐 QuizWhizz Authentication Guide for Frontend Engineers
 
 > ✅ This guide explains how to authenticate users with the QuizWhizz backend API using **Axios**, **React Query**, and **cookies** securely.
