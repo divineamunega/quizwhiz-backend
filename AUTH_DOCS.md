@@ -61,6 +61,11 @@ https://quizwhiz-backend-1.onrender.com/api/v1/auth
 - `GET /verify_email?code=abc123`
 - Requires user to be authenticated (use access token)
 
+### 6. **Resend Email Verification**
+
+- `GET /resend-verfication`
+- Requires user to be authenticated (use access token)
+
 ---
 
 ## 🧠 Important Notes
@@ -151,6 +156,23 @@ GET /refresh
 ```http
 GET /verify_email?code=abc123
 Authorization: Bearer <accessToken>
+```
+
+---
+
+### 🔁 Resend Verification Email
+
+```http
+GET /resend-verfication
+Authorization: Bearer <accessToken>
+```
+
+**Response:**
+
+```json
+{
+	"message": "Verification Code Sent successfully"
+}
 ```
 
 ---

@@ -9,9 +9,9 @@ const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 
 	const code = (req.query["code"] as string).trim();
 
-	if (!userId || !code) {
+	if (!code) {
 		// 400 Bad Request – missing required input
-		throw new AppError("Missing user ID or verification code.", 400);
+		throw new AppError("Missing verification code query param.", 400);
 	}
 
 	const verifyCode = await prisma.verificationCode.findFirst({
@@ -36,7 +36,7 @@ const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
 	}
 
 	const isCorrect = await compare(code, verifyCode.hashedCode);
-
+	console.log(code, verifyCode.hashedCode);
 	if (!isCorrect) {
 		// 401 Unauthorized – invalid or failed authentication
 		throw new AppError(

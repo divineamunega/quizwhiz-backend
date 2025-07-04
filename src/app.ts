@@ -63,6 +63,8 @@ app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 		formatedErr = handleErrorProd(error);
 		const { statusCode, ...remainingFormatedErr } = formatedErr;
 		res.status(statusCode).json(remainingFormatedErr);
+		console.log("production error");
+
 		return;
 	}
 

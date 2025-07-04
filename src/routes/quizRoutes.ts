@@ -1,8 +1,7 @@
 import { Router } from "express";
 
 import { addQuestion, createQuiz, getQuiz } from "@/controllers/quiz";
-// TODO Divine: Implement the protect functionality
-// import { protect } from "../controllers/AuthController";
+import { protect } from "@/controllers/auth";
 import {
 	createQuizValidator,
 	addQuestionValidator,
@@ -10,8 +9,8 @@ import {
 
 const router = Router();
 
-router.post("/", createQuizValidator(), createQuiz);
-router.post("/:id/question", addQuestionValidator(), addQuestion);
+router.post("/", protect, createQuizValidator(), createQuiz);
+router.post("/:id/question", protect, addQuestionValidator(), addQuestion);
 
 router.get("/:id", getQuiz);
 

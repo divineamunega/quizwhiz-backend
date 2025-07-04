@@ -1,10 +1,10 @@
 import bycrypt from "bcryptjs";
-import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import ms, { StringValue } from "ms";
 import { AsyncErrorHandler } from "@/middlewares";
-import { prisma, renderVerifyCodeTemplate, sendEmail } from "@/lib";
+import { prisma } from "@/lib";
 import { AppError } from "@/errors";
+import { sendVerificationCode } from "@/services";
 
 const environment = process.env.NODE_ENV;
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -70,29 +70,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 		path: "/",
 	});
 
-	// Send Random 6 digit code
-	const randomCode = crypto.randomBytes(3).toString("hex");
-	const hashedCode = await bycrypt.hash(randomCode, 12);
-
-	// Todo create a webhook or dont use await  for it
-
-	await prisma.verificationCode.create({
-		data: {
-			hashedCode,
-			userId: newUser.id,
-			expiresAt: new Date(Date.now() + ms("10m")),
-			type: "EMAIL",
-		},
-	});
-
-	console.log("sending email");
-
-	await sendEmail({
-		to: newUser.email,
-		subject: "Verification Code",
-		html: renderVerifyCodeTemplate(randomCode, newUser.name),
-	});
-	console.log("sent email");
+	void sendVerificationCode(newUser);
 
 	// Send response
 	res.status(201).json({

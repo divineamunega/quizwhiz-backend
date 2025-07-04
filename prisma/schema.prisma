@@ -38,8 +38,11 @@ model User {
   avatar       String?
   quizzes      Quiz[]         @relation("CreatedQuizzes")
   RefreshToken RefreshToken[]
-    verificationCode VerificationCode[]
+  verificationCode VerificationCode[]
+  quizParticipations QuizParticipant[]
 }
+
+
 model VerificationCode {
     id       String   @id @default(uuid())
     hashedCode String   @unique // Hashed verification code
@@ -56,9 +59,8 @@ model RefreshToken {
   id        String   @id @default(uuid())
   value     String   @unique // Hashed refresh token string
   userId    String
+  image     String?
   user      User     @relation(fields: [userId], references: [id])
-  isEmailVerified Boolean @default(false) // Indicates if the email is verified
-  isGoogleVerified Boolean @default(false) // Indicates if the Google account is verified
   createdAt DateTime @default(now())
   expiresAt DateTime
   ipAddress String? // For auditing/login location
@@ -67,40 +69,72 @@ model RefreshToken {
 }
 
 model Quiz {
-  id                String         @id @default(uuid())
-  name              String
+  id                         String         @id @default(uuid())
+  title                     String
   description       String
-  creatorId         String
-  tags              String[]
-  visibility        QuizVisibility
-  creator           User           @relation(fields: [creatorId], references: [id], name: "CreatedQuizzes")
-  questions         Question[]
-  status            QuizStatus
-  numberOfQuestions Int            @default(0)
+  creatorId           String
+  image                 String?
+  tags                    String[]
+  visibility           QuizVisibility @default(PUBLIC) 
+  creator              User           @relation(fields: [creatorId], references: [id], name: "CreatedQuizzes")
+  questions         Question[] @relation("QuizQuestions")
   createdAt         DateTime       @default(now())
-  joinCode          String         @default("")
+  quizSessions    QuizSession[]
+}
+
+
+enum QuizSessionType {
+  LIVE
+  SOLO
+}
+
+model QuizSession {
+  id          String    @id @default(uuid())
+  quizId      String
+  isCompleted Boolean   @default(false) 
+  hostId      String    // who started this session
+  joinCode    String?   @unique  // only present for live sessions
+  type        QuizSessionType @default(SOLO) // Type of session: LIVE or SOLO
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  quiz        Quiz      @relation(fields: [quizId], references: [id])
+  participants QuizParticipant[]
+}
+
+
+model QuizParticipant {
+  id          String    @id @default(uuid())
+  quizSessionId String
+  userId      String
+  score       Int?       @default(0)
+  quizSession QuizSession @relation(fields: [quizSessionId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([quizSessionId, userId]) 
 }
 
 model Question {
   id        String   @id @default(uuid())
-  question  String
+  text     String
   image     String?
   createdAt DateTime @default(now())
   quizId    String
-  quiz      Quiz     @relation(fields: [quizId], references: [id])
-  answers   Answer[]
+  quiz      Quiz     @relation(name: "QuizQuestions", fields: [quizId], references: [id])
+  answers   Answer[] @relation("QuestionAnswers")
+  position     Int?      // Order of the question in the quiz
+
+  @@unique([quizId, position])     // Ensures unique order per quiz
+
 }
 
 model Answer {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   isCorrect  Boolean
-  answer     String
-  question   Question @relation(fields: [questionId], references: [id])
+  text     String
   questionId String
+  question   Question  @relation(name: "QuestionAnswers", fields: [questionId], references: [id])
+  position   Int?
+
+  @@unique([questionId, position]) // Ensures unique order per question
 }
 
-enum QuizStatus {
-  IDLE
-  PROGRESS
-  LOBBY
-}

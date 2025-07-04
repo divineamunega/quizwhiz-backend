@@ -2,15 +2,15 @@ import { AppError } from "@/errors";
 import { Resend } from "resend";
 
 const resendApi = process.env.RESEND_API_KEY;
-const enviroment = process.env.NODE_ENV;
+const env = process.env.NODE_ENV;
 const resendDomain = process.env.RESEND_DOMAIN;
 
-if (!resendApi || !enviroment) {
-	throw new AppError("Invalid Enviroment", 500);
+if (!resendApi || !env) {
+	throw new AppError("Invalid environment", 500);
 }
 
-if (enviroment === "production" && !resendDomain) {
-	throw new AppError("Invalid Enviroment", 500);
+if (env === "production" && !resendDomain) {
+	throw new AppError("Missing production domain", 500);
 }
 
 const resend = new Resend(resendApi);
@@ -19,19 +19,28 @@ type SendEmailParams = {
 	to: string;
 	subject: string;
 	html: string;
+	throwError?: boolean;
 };
 
-export const sendEmail = async function ({
+export const sendEmail = async ({
 	to,
 	subject,
 	html,
-}: SendEmailParams) {
+	throwError = false,
+}: SendEmailParams): Promise<boolean> => {
 	const from = resendDomain || "onboarding@resend.dev";
 
 	const result = await resend.emails.send({ from, to, html, subject });
 
 	if (result.error) {
-		console.log(result);
-		console.log("Error while sending email");
+		console.error("Resend error:", result.error);
+
+		if (throwError) {
+			throw new AppError("Error occurred while sending email", 400);
+		}
+
+		return false;
 	}
+
+	return true;
 };
