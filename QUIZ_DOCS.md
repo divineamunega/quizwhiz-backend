@@ -172,3 +172,31 @@ GET /quiz/clxkzf0x30000v9z6jd8h3f2a
 	"message": "Quiz with that ID not found"
 }
 ```
+
+---
+
+### 🗑️ Delete a Quiz
+
+- **Endpoint:** `DELETE /quiz/:id`
+- **Method:** `DELETE`
+- **Authentication:** Required
+
+**Request:**
+
+```http
+DELETE /quiz/clxkzf0x30000v9z6jd8h3f2a
+Authorization: Bearer <accessToken>
+```
+
+**Response (204 No Content):**
+
+The server will respond with a `204 No Content` status code if the quiz is successfully deleted.
+
+**Response (404 Not Found):**
+
+```json
+{
+	"status": "fail",
+	"message": "Quiz not found"
+}
+```

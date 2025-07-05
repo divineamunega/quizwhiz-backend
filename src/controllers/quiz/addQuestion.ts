@@ -14,6 +14,7 @@ export const addQuestion = AsyncErrorHandler(
 		const quiz = await prisma.quiz.findUnique({
 			where: {
 				id: quizId,
+				isDeleted: false,
 			},
 		});
 
