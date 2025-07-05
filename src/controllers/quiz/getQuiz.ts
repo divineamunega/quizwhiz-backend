@@ -12,7 +12,7 @@ export const getQuiz = AsyncErrorHandler(
 		if (!id) throw new AppError("Invalid request. Quiz ID is missing.", 400);
 
 		const quiz = await prisma.quiz.findUnique({
-			where: { id, visibility: "PUBLIC" },
+			where: { id, visibility: "PUBLIC", isDeleted: false },
 			select: {
 				id: true,
 				title: true,
