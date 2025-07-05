@@ -80,6 +80,7 @@ model Quiz {
   questions         Question[] @relation("QuizQuestions")
   createdAt         DateTime       @default(now())
   quizSessions    QuizSession[]
+  isDeleted     Boolean        @default(false) 
 }
 
 
