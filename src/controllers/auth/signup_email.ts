@@ -28,7 +28,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	const { name, email, password } = req.data;
 
 	// Hash the password with a salt of 12 rounds
-	const hashedPassword = await bycrypt.hash(password, 12);
+	const hashedPassword = await bycrypt.hash(password, 10);
 
 	// Create a new user in the database with the hashed password
 	const newUser = await prisma.user.create({
@@ -50,7 +50,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	});
 
 	// hash refresh tokem
-	const hashedRefreshToken = await bycrypt.hash(refreshToken, 12);
+	const hashedRefreshToken = await bycrypt.hash(refreshToken, 10);
 
 	// TODO Use Prisma transactions
 	await prisma.refreshToken.create({
