@@ -43,6 +43,12 @@ app.use(
 /**
  *  Routes
  */
+app.get("/", (req, res) => {
+	res.status(200).json({
+		status: "success",
+		message: "Welcome to the quizwhizz api",
+	});
+});
 app.use("/api/v1/quiz", quizRouter);
 app.use("/api/v1/auth", authRouter);
 
