@@ -5,6 +5,8 @@ import { AsyncErrorHandler } from "@/middlewares";
 import { prisma } from "@/lib";
 import { AppError } from "@/errors";
 import { sendVerificationCode } from "@/services";
+import { hashToken } from "@/utils";
+import crypto from "node:crypto";
 
 const environment = process.env.NODE_ENV;
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -45,12 +47,10 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	});
 
 	// Create Refresh token
-	const refreshToken = jwt.sign({ id: newUser.id }, refreshSecret, {
-		expiresIn: refreshTokenExpiresIn,
-	});
+	const refreshToken = "quizwhizz_rt" + crypto.randomBytes(32).toString("hex");
 
 	// hash refresh tokem
-	const hashedRefreshToken = await bycrypt.hash(refreshToken, 10);
+	const hashedRefreshToken = hashToken(refreshToken);
 
 	// TODO Use Prisma transactions
 	await prisma.refreshToken.create({

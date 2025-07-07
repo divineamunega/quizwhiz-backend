@@ -1,10 +1,10 @@
 import { AppError } from "@/errors";
 import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
-import { verifyJWT } from "@/utils";
-import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import ms, { StringValue } from "ms";
+import { hashToken } from "@/utils";
 
 // Environment variable validation
 const environment = process.env.NODE_ENV;
@@ -34,37 +34,16 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 		throw new AppError("Refresh token missing. Please log in again.", 401);
 	}
 
-	const payload = verifyJWT(rawRefreshToken, refreshSecret) as {
-		id: string;
-		iat: number;
-		exp: number;
-	};
-
-	const user = await prisma.user.findFirst({ where: { id: payload.id } });
-
-	if (!user) {
-		throw new AppError("User associated with token not found.", 401);
-	}
-
-	const validTokens = await prisma.refreshToken.findMany({
+	const hashedRawRefreshToken = hashToken(rawRefreshToken);
+	const validToken = await prisma.refreshToken.findUnique({
 		where: {
-			userId: payload.id,
+			value: hashedRawRefreshToken,
 			expiresAt: { gt: new Date() },
 			revoked: false,
 		},
-		orderBy: { createdAt: "desc" },
 	});
 
-	let activeToken = null;
-	for (const token of validTokens) {
-		const isMatch = await bcrypt.compare(rawRefreshToken, token.value);
-		if (isMatch) {
-			activeToken = token;
-			break;
-		}
-	}
-
-	if (!activeToken) {
+	if (!validToken) {
 		throw new AppError(
 			"Refresh token is invalid or has already been used.",
 			401
@@ -72,27 +51,26 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 	}
 
 	// Token rotation
-	const newAccessToken = jwt.sign({ id: activeToken.userId }, accessSecret, {
+	const newAccessToken = jwt.sign({ id: validToken.userId }, accessSecret, {
 		expiresIn: accessExpiresIn,
 	});
 
-	const newRefreshToken = jwt.sign({ id: activeToken.userId }, refreshSecret, {
-		expiresIn: refreshTokenExpiresIn,
-	});
+	const newRefreshToken =
+		"quizwhizz_rt" + crypto.randomBytes(32).toString("hex");
 
-	const hashedNewRefreshToken = await bcrypt.hash(newRefreshToken, 12);
+	const hashedRefreshToken = hashToken(newRefreshToken);
+
+	await prisma.refreshToken.update({
+		where: { id: validToken.id },
+		data: { revoked: true },
+	});
 
 	await prisma.refreshToken.create({
 		data: {
-			userId: activeToken.userId,
-			value: hashedNewRefreshToken,
+			userId: validToken.userId,
+			value: hashedRefreshToken,
 			expiresAt: new Date(Date.now() + ms(refreshTokenExpiresIn)),
 		},
-	});
-
-	await prisma.refreshToken.update({
-		where: { id: activeToken.id },
-		data: { revoked: true },
 	});
 
 	res.cookie("_rt", newRefreshToken, {
