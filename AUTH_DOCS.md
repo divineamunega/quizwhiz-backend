@@ -177,6 +177,30 @@ Authorization: Bearer <accessToken>
 
 ---
 
+### ✅ Check User Status
+
+This endpoint allows you to verify the authentication status of a user and retrieve their basic information. It's useful for checking if a user's session is still active.
+
+```http
+GET /check
+Authorization: Bearer <accessToken>
+```
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "user": {
+        "name": "Divine",
+        "email": "divine@gmail.com",
+        "image": null
+    }
+}
+```
+
+---
+
 ### 🔒 Access Protected Routes
 
 ```http
