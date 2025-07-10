@@ -40,6 +40,7 @@ model User {
   RefreshToken RefreshToken[]
   verificationCode VerificationCode[]
   quizParticipations QuizParticipant[]
+  quizHost         QuizSession[] @relation("UserHostedSessions")
 }
 
 
@@ -94,12 +95,15 @@ model QuizSession {
   quizId      String
   isCompleted Boolean   @default(false) 
   hostId      String    // who started this session
-  joinCode    String?   @unique  // only present for live sessions
+  joinCode    String?   @unique  
   type        QuizSessionType @default(SOLO) // Type of session: LIVE or SOLO
-  startedAt   DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime? // When the session started
+  hostParticipantId String? // The participant who is the host in a live session
   endedAt     DateTime?
   quiz        Quiz      @relation(fields: [quizId], references: [id])
   participants QuizParticipant[]
+  host        User      @relation("UserHostedSessions", fields: [hostId], references: [id])
 }
 
 
