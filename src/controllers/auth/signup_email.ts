@@ -65,7 +65,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	res.cookie("_rt", refreshToken, {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
-		sameSite: environment === "production" ? "none" : "lax",
+		sameSite: "none",
 		secure: environment === "production",
 		path: "/",
 	});
