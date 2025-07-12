@@ -69,7 +69,7 @@ export const login = AsyncErrorHandler(async (req, res, next) => {
 	res.cookie("_rt", refreshToken, {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
-		sameSite: "lax",
+		sameSite: "none",
 		secure: environment === "production",
 		path: "/",
 	});

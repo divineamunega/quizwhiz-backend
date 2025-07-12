@@ -76,7 +76,7 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 	res.cookie("_rt", newRefreshToken, {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
-		sameSite: environment === "production" ? "none" : "lax",
+		sameSite: "none",
 		secure: environment === "production",
 		path: "/",
 	});
