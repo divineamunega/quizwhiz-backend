@@ -4,7 +4,6 @@ import ms, { StringValue } from "ms";
 
 const refreshTokenExpiresIn = process.env
 	.REFRESH_TOKEN_EXPIRES_IN as StringValue;
-const secureCookie = process.env.SECURE_REFRESH_COOKIE;
 
 if (!refreshTokenExpiresIn) {
 	throw new AppError("Invalid enviroment variables", 500);
@@ -16,7 +15,8 @@ export const sendRefreshCookie = function (res: Response, token: string) {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
 		sameSite: "lax",
-		secure: secureCookie === "true" ? true : false,
+		secure: true,
 		path: "/",
+		domain: "",
 	});
 };
