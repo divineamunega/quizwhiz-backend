@@ -5,8 +5,8 @@ import { AsyncErrorHandler } from "@/middlewares";
 import { prisma } from "@/lib";
 import { AppError } from "@/errors";
 import { sendVerificationCode } from "@/services";
-import { hashToken } from "@/utils";
-import crypto from "node:crypto";
+import { createRefresh } from "@/utils/createRefresh";
+import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
 
 const environment = process.env.NODE_ENV;
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -46,11 +46,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 		expiresIn: accessExpiresIn,
 	});
 
-	// Create Refresh token
-	const refreshToken = "quizwhizz_rt" + crypto.randomBytes(32).toString("hex");
-
-	// hash refresh tokem
-	const hashedRefreshToken = hashToken(refreshToken);
+	const [refreshToken, hashedRefreshToken] = createRefresh();
 
 	// TODO Use Prisma transactions
 	await prisma.refreshToken.create({
@@ -62,13 +58,7 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	});
 
 	// Send refresh token as http-only cookie
-	res.cookie("_rt", refreshToken, {
-		maxAge: ms(refreshTokenExpiresIn),
-		httpOnly: true,
-		sameSite: "none",
-		secure: environment === "production",
-		path: "/",
-	});
+	sendRefreshCookie(res, refreshToken);
 
 	void sendVerificationCode(newUser);
 
