@@ -15,7 +15,7 @@ export const sendRefreshCookie = function (res: Response, token: string) {
 	res.cookie("_rt", token, {
 		maxAge: ms(refreshTokenExpiresIn),
 		httpOnly: true,
-		sameSite: "none",
+		sameSite: "lax",
 		secure: secureCookie === "true" ? true : false,
 		path: "/",
 	});
