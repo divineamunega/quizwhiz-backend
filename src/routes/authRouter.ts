@@ -6,9 +6,9 @@ import {
 	refresh,
 	signup,
 	verifyEmail,
+	check,
 } from "@/controllers/auth";
 import { resendVerification } from "@/controllers/auth/resendVerification";
-import { check } from "express-validator";
 
 const router = Router({ caseSensitive: false });
 

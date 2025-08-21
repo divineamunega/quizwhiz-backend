@@ -1,10 +1,11 @@
 import { AppError } from "@/errors";
 import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
-import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import ms, { StringValue } from "ms";
 import { hashToken } from "@/utils";
+import { createRefresh } from "@/utils/createRefresh";
+import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
 
 // Environment variable validation
 const environment = process.env.NODE_ENV;
@@ -54,11 +55,7 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 	const newAccessToken = jwt.sign({ id: validToken.userId }, accessSecret, {
 		expiresIn: accessExpiresIn,
 	});
-
-	const newRefreshToken =
-		"quizwhizz_rt" + crypto.randomBytes(32).toString("hex");
-
-	const hashedRefreshToken = hashToken(newRefreshToken);
+	const [newRefreshToken, hashedRefreshToken] = createRefresh();
 
 	await prisma.refreshToken.update({
 		where: { id: validToken.id },
@@ -73,13 +70,7 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 		},
 	});
 
-	res.cookie("_rt", newRefreshToken, {
-		maxAge: ms(refreshTokenExpiresIn),
-		httpOnly: true,
-		sameSite: "none",
-		secure: environment === "production",
-		path: "/",
-	});
+	sendRefreshCookie(res, newRefreshToken);
 
 	res.status(200).json({
 		status: "success",

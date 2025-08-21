@@ -3,7 +3,6 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import session from "express-session";
 
 import { authRouter } from "@/routes";
 import { quizRouter } from "@/routes";
@@ -32,13 +31,13 @@ app.options(
 	})
 );
 
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET + "",
-		resave: false,
-		saveUninitialized: true,
-	})
-);
+// app.use(
+// 	session({
+// 		secret: process.env.SESSION_SECRET + "",
+// 		resave: false,
+// 		saveUninitialized: true,
+// 	})
+// );
 
 /**
  *  Routes
