@@ -18,7 +18,7 @@ const router = Router();
 router.post("/", protect, createQuizValidator(), createQuiz);
 router.post("/:id/question", protect, addQuestionValidator(), addQuestion);
 router.get("/:id/question", protect, getQuestions);
-router.get("/:id/question/:questionId");
+// router.get("/:id/question/:questionId");
 router.get("/:id", getQuiz);
 router.delete("/:id", protect, removeQuiz);
 
