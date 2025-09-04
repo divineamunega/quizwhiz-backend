@@ -5,6 +5,7 @@ import {
 	createQuiz,
 	getQuestions,
 	getQuiz,
+	getQuizzes,
 	removeQuiz,
 } from "@/controllers/quiz";
 import { protect } from "@/controllers/auth";
@@ -15,7 +16,7 @@ import {
 
 const router = Router();
 
-router.get("/", protect, getQuiz);
+router.get("/", protect, getQuizzes);
 router.post("/", protect, createQuizValidator(), createQuiz);
 router.post("/:id/question", protect, addQuestionValidator(), addQuestion);
 router.get("/:id/question", protect, getQuestions);

@@ -4,3 +4,4 @@ export * from "./addQuestion";
 export * from "./removeQuiz";
 export * from "./createSession";
 export * from "./getQuestions";
+export * from "./getQuizzes";

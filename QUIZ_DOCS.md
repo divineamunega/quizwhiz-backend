@@ -135,7 +135,42 @@ Authorization: Bearer <accessToken>
 
 ---
 
-### 📄 Get a Quiz
+### 📄 Get All Quizzes (for authenticated user)
+
+- **Endpoint:** `GET /quiz`
+- **Method:** `GET`
+- **Authentication:** Required
+
+**Request:**
+
+```http
+GET /quiz
+Authorization: Bearer <accessToken>
+```
+
+**Response (200 OK):**
+
+```json
+{
+	"status": "success",
+	"data": [
+		{
+			"id": "clxkzf0x30000v9z6jd8h3f2a",
+			"title": "My Awesome Quiz",
+			"image": null,
+			"description": "A quiz about interesting facts.",
+			"createdAt": "2025-07-04T14:30:00.000Z",
+			"tags": ["history", "science"],
+			"visibility": "private"
+		},
+		// ... more quizzes
+	]
+}
+```
+
+---
+
+### 📄 Get a Single Quiz (by ID)
 
 - **Endpoint:** `GET /quiz/:id`
 - **Method:** `GET`
@@ -156,8 +191,7 @@ GET /quiz/clxkzf0x30000v9z6jd8h3f2a
 		"id": "clxkzf0x30000v9z6jd8h3f2a",
 		"title": "My Awesome Quiz",
 		"image": null,
-		"description": "A quiz about interesting facts.",
-		"createdAt": "2025-07-04T14:30:00.000Z",
+		"description": "A quiz about interesting facts.",		"createdAt": "2025-07-04T14:30:00.000Z",
 		"tags": ["history", "science"],
 		"visibility": "private"
 	}
@@ -170,6 +204,55 @@ GET /quiz/clxkzf0x30000v9z6jd8h3f2a
 {
 	"status": "fail",
 	"message": "Quiz with that ID not found"
+}
+```
+
+---
+
+### ❓ Get Questions for a Quiz
+
+- **Endpoint:** `GET /quiz/:id/question`
+- **Method:** `GET`
+- **Authentication:** Required
+
+**Request:**
+
+```http
+GET /quiz/clxkzf0x30000v9z6jd8h3f2a/question
+Authorization: Bearer <accessToken>
+```
+
+**Response (200 OK):**
+
+```json
+{
+	"status": "success",
+	"data": [
+		{
+			"id": "clxkzf9d40002v9z6k4h2b1c3",
+			"quizId": "clxkzf0x30000v9z6jd8h3f2a",
+			"text": "What is the capital of France?",
+			"answers": [
+				{
+					"id": "clxkzf9d40003v9z6a7b8c9d0",
+					"questionId": "clxkzf9d40002v9z6k4h2b1c3",
+					"text": "Berlin",
+					"isCorrect": false
+				},
+				// ... more answers
+			]
+		},
+		// ... more questions
+	]
+}
+```
+
+**Response (404 Not Found):**
+
+```json
+{
+	"status": "fail",
+	"message": "Quiz or questions not found"
 }
 ```
 
