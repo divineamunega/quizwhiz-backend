@@ -15,6 +15,7 @@ import {
 
 const router = Router();
 
+router.get("/", protect, getQuiz);
 router.post("/", protect, createQuizValidator(), createQuiz);
 router.post("/:id/question", protect, addQuestionValidator(), addQuestion);
 router.get("/:id/question", protect, getQuestions);
