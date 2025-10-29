@@ -3,8 +3,6 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
-// how are you doing man
 import { authRouter } from "@/routes";
 import { quizRouter } from "@/routes";
 import { AppError } from "@/errors";

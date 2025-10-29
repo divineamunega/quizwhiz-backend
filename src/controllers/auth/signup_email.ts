@@ -10,7 +10,7 @@ import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
 
 const environment = process.env.NODE_ENV;
 const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN;
+const accessExpiresIn = process.env.ACCESS_EXPIRES_IN as StringValue;
 const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
 const refreshTokenExpiresIn = process.env
 	.REFRESH_TOKEN_EXPIRES_IN as StringValue;

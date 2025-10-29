@@ -2,6 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { matchedData, validationResult } from "express-validator";
 import { AppError } from "@/errors";
 
+// Extend Express Request interface to include data property
+declare global {
+	namespace Express {
+		interface Request {
+			data?: any;
+		}
+	}
+}
+
 /**
  * Middleware to handle validation errors and extract validated data.
  *

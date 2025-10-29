@@ -8,8 +8,19 @@ const getQuizzes = AsyncErrorHandler(async function (
 ) {
 	const user = req.user!;
 
+	const { search } = req.query;
+
+	const whereClause: any = { creatorId: user.id, isDeleted: false };
+
+	if (search) {
+		whereClause.title = {
+			contains: search as string,
+			mode: 'insensitive',
+		};
+	}
+
 	const quizes = await prisma.quiz.findMany({
-		where: { creatorId: user.id, isDeleted: false },
+		where: whereClause,
 		take: 10,
 		orderBy: { createdAt: "desc" },
 	});
