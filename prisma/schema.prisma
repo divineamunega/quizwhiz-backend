@@ -112,8 +112,9 @@ model QuizParticipant {
   quizSessionId String
   userId      String
   score       Int?       @default(0)
+  name String? // Name of the participant
   quizSession QuizSession @relation(fields: [quizSessionId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
+  user        User ?     @relation(fields: [userId], references: [id])
 
   @@unique([quizSessionId, userId]) 
 }

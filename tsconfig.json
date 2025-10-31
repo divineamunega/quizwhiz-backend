@@ -3,7 +3,6 @@
 		"target": "ESNext",
 		"module": "commonjs",
 		"outDir": "./dist",
-		"rootDir": "./src",
 		"strict": true,
 		"esModuleInterop": true,
 		"noUnusedLocals": true,
@@ -11,8 +10,13 @@
 		"paths": {
 			"@/*": ["./src/*"]
 		},
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"types": ["node"],
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"skipDefaultLibCheck": true
 	},
-	"include": ["src"],
-	"exclude": ["node_modules"]
+	"include": ["src/**/*", "scripts/**/*"],
+	"exclude": ["node_modules", "dist"]
 }
