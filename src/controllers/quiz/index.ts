@@ -5,3 +5,4 @@ export * from "./removeQuiz";
 export * from "./createSession";
 export * from "./getQuestions";
 export * from "./getQuizzes";
+export * from "./getPublicQuizzes";

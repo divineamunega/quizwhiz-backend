@@ -7,6 +7,7 @@ import {
 	getQuestions,
 	getQuiz,
 	getQuizzes,
+	getPublicQuizzes,
 	removeQuiz,
 } from "@/controllers/quiz";
 import { protect } from "@/controllers/auth";
@@ -17,6 +18,7 @@ import {
 
 const router = Router();
 
+router.get("/public", getPublicQuizzes); // Public endpoint for all users
 router.get("/", protect, getQuizzes);
 router.post("/", protect, createQuizValidator(), createQuiz);
 router.post("/:id/question", protect, addQuestionValidator(), addQuestion);
