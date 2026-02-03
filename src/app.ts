@@ -7,6 +7,7 @@ import { authRouter } from "@/routes";
 import { quizRouter } from "@/routes";
 import { AppError } from "@/errors";
 import { handleErrorDev, handleErrorProd } from "@/errors";
+import { env } from "@/config/env";
 
 const app = express();
 app.use(cookieParser());
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: env.frontendUrl,
 		credentials: true,
 		optionsSuccessStatus: 200,
 		methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
@@ -23,7 +24,7 @@ app.use(
 app.options(
 	"*",
 	cors({
-		origin: "http://localhost:5173",
+		origin: env.frontendUrl,
 		credentials: true,
 		optionsSuccessStatus: 200,
 		methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
@@ -63,7 +64,7 @@ app.use("*", (req: Request, res: Response) => {
 app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 	let formatedErr;
 
-	if (process.env.NODE_ENV === "production") {
+	if (env.nodeEnv === "production") {
 		formatedErr = handleErrorProd(error);
 		const { statusCode, ...remainingFormatedErr } = formatedErr;
 		res.status(statusCode).json(remainingFormatedErr);
@@ -72,7 +73,7 @@ app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
 		return;
 	}
 
-	if (process.env.NODE_ENV === "development") {
+	if (env.nodeEnv === "development") {
 		console.log(error);
 		formatedErr = handleErrorDev(error);
 		res.status(formatedErr.statusCode || 500).json(formatedErr);

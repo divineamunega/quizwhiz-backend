@@ -1,6 +1,7 @@
 import { Worker } from "bullmq";
 import { prisma } from "@/lib/prisma";
 import redisClient from "@/lib/redis";
+import { env } from "@/config/env";
 const worker = new Worker(
 	"quiz",
 	async (job) => {
@@ -26,7 +27,7 @@ const worker = new Worker(
 	},
 	{
 		connection: {
-			url: process.env.REDIS_URL || "redis://localhost:6379",
+			url: env.redisUrl,
 		},
 	}
 );

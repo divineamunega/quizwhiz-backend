@@ -1,19 +1,8 @@
 import { AppError } from "@/errors";
 import { Resend } from "resend";
+import { env } from "@/config/env";
 
-const resendApi = process.env.RESEND_API_KEY;
-const env = process.env.NODE_ENV;
-const resendDomain = process.env.RESEND_DOMAIN;
-
-if (!resendApi || !env) {
-	throw new AppError("Invalid environment", 500);
-}
-
-if (env === "production" && !resendDomain) {
-	throw new AppError("Missing production domain", 500);
-}
-
-const resend = new Resend(resendApi);
+const resend = new Resend(env.resendApiKey);
 
 type SendEmailParams = {
 	to: string;
@@ -28,7 +17,7 @@ export const sendEmail = async ({
 	html,
 	throwError = false,
 }: SendEmailParams): Promise<boolean> => {
-	const from = resendDomain || "onboarding@resend.dev";
+	const from = env.resendDomain || "onboarding@resend.dev";
 
 	const result = await resend.emails.send({ from, to, html, subject });
 

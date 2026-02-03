@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { ExtendedError } from "socket.io/dist/namespace";
 import { verifyJWT } from "@/utils";
 import { JwtPayload } from "jsonwebtoken";
+import { env } from "@/config/env";
 
 interface AuthenticatedSocket extends Socket {
 	userId?: string;
@@ -29,15 +30,10 @@ export const socketAuthMiddleware = (
 		}
 
 		// Get the access token secret from environment
-		const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-		if (!accessTokenSecret) {
-			return next(new Error("Server configuration error"));
-		}
-
 		// Verify JWT token
 		const decoded = verifyJWT(
 			token as string,
-			accessTokenSecret
+			env.accessTokenSecret
 		) as DecodedToken;
 
 		if (!decoded || typeof decoded === "string" || !decoded.id) {

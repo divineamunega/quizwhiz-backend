@@ -6,74 +6,63 @@ import ms, { StringValue } from "ms";
 import { hashToken } from "@/utils";
 import { createRefresh } from "@/utils/createRefresh";
 import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
-
-// Environment variable validation
-const environment = process.env.NODE_ENV;
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN;
-const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
-const refreshTokenExpiresIn = process.env
-	.REFRESH_TOKEN_EXPIRES_IN as StringValue;
-
-if (
-	!accessSecret ||
-	!accessExpiresIn ||
-	!refreshSecret ||
-	!refreshTokenExpiresIn ||
-	!environment
-) {
-	throw new AppError(
-		"Server misconfiguration: missing environment variables.",
-		500
-	);
-}
+import { env } from "@/config/env";
 
 export const refresh = AsyncErrorHandler(async (req, res, next) => {
-	const rawRefreshToken = req.cookies["_rt"];
+  const rawRefreshToken = req.cookies["_rt"];
 
-	if (!rawRefreshToken) {
-		throw new AppError("Refresh token missing. Please log in again.", 401);
-	}
+  if (!rawRefreshToken) {
+    throw new AppError("Refresh token missing. Please log in again.", 401);
+  }
 
-	const hashedRawRefreshToken = hashToken(rawRefreshToken);
-	const validToken = await prisma.refreshToken.findUnique({
-		where: {
-			value: hashedRawRefreshToken,
-			expiresAt: { gt: new Date() },
-			revoked: false,
-		},
-	});
+  const hashedRawRefreshToken = hashToken(rawRefreshToken);
+  const validToken = await prisma.refreshToken.findFirst({
+    where: {
+      value: hashedRawRefreshToken,
+      expiresAt: { gt: new Date() },
+      revoked: false,
+    },
+  });
 
-	if (!validToken) {
-		throw new AppError(
-			"Refresh token is invalid or has already been used.",
-			401
-		);
-	}
+  if (!validToken) {
+    throw new AppError(
+      "Refresh token is invalid or has already been used.",
+      401,
+    );
+  }
 
-	// Token rotation
-	const newAccessToken = jwt.sign({ id: validToken.userId }, accessSecret, {
-		expiresIn: accessExpiresIn,
-	});
-	const [newRefreshToken, hashedRefreshToken] = createRefresh();
+  // Token rotation
+  const newAccessToken = jwt.sign(
+    { id: validToken.userId },
+    env.accessTokenSecret,
+    {
+      expiresIn: env.accessExpiresIn as StringValue,
+    },
+  );
 
-	await prisma.refreshToken.update({
-		where: { id: validToken.id },
-		data: { revoked: true },
-	});
+  const [newRefreshToken, hashedRefreshToken] = createRefresh();
 
-	await prisma.refreshToken.create({
-		data: {
-			userId: validToken.userId,
-			value: hashedRefreshToken,
-			expiresAt: new Date(Date.now() + ms(refreshTokenExpiresIn)),
-		},
-	});
+  await prisma.$transaction(async (tx) => {
+    await tx.refreshToken.update({
+      where: { id: validToken.id },
+      data: { revoked: true },
+    });
 
-	sendRefreshCookie(res, newRefreshToken);
+    await tx.refreshToken.create({
+      data: {
+        userId: validToken.userId,
+        value: hashedRefreshToken,
+        expiresAt: new Date(
+          Date.now() + ms(env.refreshTokenExpiresIn as StringValue),
+        ),
+      },
+    });
+  });
 
-	res.status(200).json({
-		status: "success",
-		accessToken: newAccessToken,
-	});
+  sendRefreshCookie(res, newRefreshToken);
+
+  res.status(200).json({
+    status: "success",
+    accessToken: newAccessToken,
+  });
 });

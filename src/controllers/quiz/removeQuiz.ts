@@ -1,32 +1,33 @@
+import { AuthenticatedRequest } from "@/types";
 import { AppError } from "@/errors";
 import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
 
-export const removeQuiz = AsyncErrorHandler(async function (req, res) {
-	const quizId = req.params.id;
-	const userId = req.user?.id;
+export const removeQuiz = AsyncErrorHandler(async function (
+  req: AuthenticatedRequest,
+  res,
+) {
+  const quizId = req.params.id;
+  const userId = req.user?.id;
 
-	if (!quizId) {
-		throw new AppError("Quiz ID is required", 400);
-	}
+  if (!quizId) {
+    throw new AppError("Quiz ID is required", 400);
+  }
 
-	try {
-		await prisma.quiz.update({
-			where: {
-				id: quizId,
-				creatorId: userId,
-				isDeleted: false,
-			},
-			data: {
-				isDeleted: true,
-			},
-		});
-	} catch (err: any) {
-		if (err.code === "P2025") {
-			throw new AppError("Quiz not found", 404);
-		}
-		throw err;
-	}
+  const result = await prisma.quiz.updateMany({
+    where: {
+      id: quizId,
+      creatorId: userId,
+      isDeleted: false,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
 
-	res.status(204).send();
+  if (result.count === 0) {
+    throw new AppError("Quiz not found", 404);
+  }
+
+  res.status(204).send();
 });

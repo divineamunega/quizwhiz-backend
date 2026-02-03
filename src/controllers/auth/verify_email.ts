@@ -1,64 +1,69 @@
+import { AuthenticatedRequest } from "@/types";
 import { isAfter } from "date-fns";
 import { AppError } from "@/errors";
 import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
 import { compare } from "bcryptjs";
 
-const verifyEmail = AsyncErrorHandler(async function (req, res, next) {
-	const userId = req.user?.id;
+const verifyEmail = AsyncErrorHandler(async function (
+  req: AuthenticatedRequest,
+  res,
+  next,
+) {
+  const userId = req.user?.id;
 
-	const code = (req.query["code"] as string).trim();
+  const code = (req.query["code"] as string).trim();
 
-	if (!code) {
-		// 400 Bad Request – missing required input
-		throw new AppError("Missing verification code query param.", 400);
-	}
+  if (!code) {
+    // 400 Bad Request – missing required input
+    throw new AppError("Missing verification code query param.", 400);
+  }
 
-	const verifyCode = await prisma.verificationCode.findFirst({
-		where: { userId, isUsed: false, type: "EMAIL" },
-		orderBy: { createdAt: "desc" },
-	});
+  const verifyCode = await prisma.verificationCode.findFirst({
+    where: { userId, isUsed: false, type: "EMAIL" },
+    orderBy: { createdAt: "desc" },
+  });
 
-	if (!verifyCode) {
-		// 404 Not Found – no active verification code exists
-		throw new AppError(
-			"No active verification code found. Please request a new one.",
-			404
-		);
-	}
+  if (!verifyCode) {
+    // 404 Not Found – no active verification code exists
+    throw new AppError(
+      "No active verification code found. Please request a new one.",
+      404,
+    );
+  }
 
-	if (isAfter(new Date(), verifyCode.expiresAt)) {
-		// 410 Gone – resource existed but is no longer valid
-		throw new AppError(
-			"This verification code has expired. Please request a new one.",
-			410
-		);
-	}
+  if (isAfter(new Date(), verifyCode.expiresAt)) {
+    // 410 Gone – resource existed but is no longer valid
+    throw new AppError(
+      "This verification code has expired. Please request a new one.",
+      410,
+    );
+  }
 
-	const isCorrect = await compare(code, verifyCode.hashedCode);
-	console.log(code, verifyCode.hashedCode);
-	if (!isCorrect) {
-		// 401 Unauthorized – invalid or failed authentication
-		throw new AppError(
-			"Invalid verification code. Please check the code and try again.",
-			401
-		);
-	}
+  const isCorrect = await compare(code, verifyCode.hashedCode);
+  console.log(code, verifyCode.hashedCode);
+  if (!isCorrect) {
+    // 401 Unauthorized – invalid or failed authentication
+    throw new AppError(
+      "Invalid verification code. Please check the code and try again.",
+      401,
+    );
+  }
 
-	await prisma.verificationCode.update({
-		where: { id: verifyCode.id },
-		data: { isUsed: true },
-	});
+  await prisma.verificationCode.update({
+    where: { id: verifyCode.id },
+    data: { isUsed: true },
+  });
 
-	await prisma.user.update({
-		where: { id: userId },
-		data: { emailVerified: true },
-	});
+  await prisma.user.update({
+    where: { id: userId },
+    data: { emailVerified: true },
+  });
 
-	res.status(200).json({
-		status: "success",
-		message: `User ${userId} email verified successfully.`,
-	});
+  res.status(200).json({
+    status: "success",
+    message: `User ${userId} email verified successfully.`,
+  });
 });
 
 export { verifyEmail };
