@@ -5,8 +5,9 @@ if (process.env.NODE_ENV === "production") {
 import app from "./app";
 import { createServer } from "node:http";
 import { prisma, redisClient, createWebSocketServer } from "@/lib";
+import { env } from "@/config/env";
 
-const PORT = process.env.PORT || 4000;
+const PORT = env.port;
 
 const server = createServer(app);
 
@@ -28,7 +29,7 @@ async function startServer() {
 
 		server.listen(PORT, () => {
 			console.log(
-				`Server running on port ${PORT} in ${process.env.NODE_ENV?.toLowerCase()}.`
+				`Server running on port ${PORT} in ${env.nodeEnv.toLowerCase()}.`
 			);
 			console.log("WebSocket server initialized");
 		});

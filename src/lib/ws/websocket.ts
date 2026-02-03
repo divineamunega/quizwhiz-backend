@@ -207,6 +207,7 @@
 
 import { Server as SocketIOServer } from "socket.io";
 import { Server as HttpServer } from "http";
+import { env } from "@/config/env";
 
 const startQuiz = async (quizId: string) => {
 	if (!quizId) return;
@@ -220,7 +221,7 @@ const startQuiz = async (quizId: string) => {
 const createWebSocketServer = (httpServer: HttpServer) => {
 	const io = new SocketIOServer(httpServer, {
 		cors: {
-			origin: process.env.FRONTEND_URL || "http://localhost:5173",
+			origin: env.frontendUrl,
 			methods: ["GET", "POST"],
 			credentials: true,
 		},

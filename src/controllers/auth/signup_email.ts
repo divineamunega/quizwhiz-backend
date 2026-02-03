@@ -3,27 +3,10 @@ import jwt from "jsonwebtoken";
 import ms, { StringValue } from "ms";
 import { AsyncErrorHandler } from "@/middlewares";
 import { prisma } from "@/lib";
-import { AppError } from "@/errors";
 import { sendVerificationCode } from "@/services";
 import { createRefresh } from "@/utils/createRefresh";
 import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
-
-const environment = process.env.NODE_ENV;
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN as StringValue;
-const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
-const refreshTokenExpiresIn = process.env
-	.REFRESH_TOKEN_EXPIRES_IN as StringValue;
-
-if (
-	!accessSecret ||
-	!accessExpiresIn ||
-	!refreshSecret ||
-	!refreshTokenExpiresIn ||
-	!environment
-) {
-	throw new AppError("Invalid enviroment variables", 500);
-}
+import { env } from "@/config/env";
 
 export const signup = AsyncErrorHandler(async (req, res) => {
 	// Extract name, email, and password from the validated request data
@@ -42,8 +25,8 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	});
 
 	// Create Access token
-	const accessToken = jwt.sign({ id: newUser.id }, accessSecret, {
-		expiresIn: accessExpiresIn,
+	const accessToken = jwt.sign({ id: newUser.id }, env.accessTokenSecret, {
+		expiresIn: env.accessExpiresIn as StringValue,
 	});
 
 	const [refreshToken, hashedRefreshToken] = createRefresh();
@@ -51,7 +34,9 @@ export const signup = AsyncErrorHandler(async (req, res) => {
 	// TODO Use Prisma transactions
 	await prisma.refreshToken.create({
 		data: {
-			expiresAt: new Date(Date.now() + ms(refreshTokenExpiresIn)),
+			expiresAt: new Date(
+				Date.now() + ms(env.refreshTokenExpiresIn as StringValue)
+			),
 			value: hashedRefreshToken,
 			userId: newUser.id,
 		},

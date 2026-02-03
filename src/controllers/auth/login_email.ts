@@ -8,21 +8,7 @@ import { AsyncErrorHandler } from "@/middlewares";
 
 import { createRefresh } from "@/utils/createRefresh";
 import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
-
-const environment = process.env.NODE_ENV;
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN;
-const refreshTokenExpiresIn = process.env
-  .REFRESH_TOKEN_EXPIRES_IN as StringValue;
-
-if (
-  !accessSecret ||
-  !accessExpiresIn ||
-  !refreshTokenExpiresIn ||
-  !environment
-) {
-  throw new AppError("Invalid enviroment variables", 500);
-}
+import { env } from "@/config/env";
 
 export const login = AsyncErrorHandler(async (req, res, next) => {
   // Extract email and password from the validated request data
@@ -45,8 +31,8 @@ export const login = AsyncErrorHandler(async (req, res, next) => {
     throw new AppError("Authentication Error", 401, null, "login_error");
   }
   // Create Access token
-  const accessToken = jwt.sign({ id: user.id }, accessSecret as string, {
-    expiresIn: accessExpiresIn as StringValue,
+  const accessToken = jwt.sign({ id: user.id }, env.accessTokenSecret, {
+    expiresIn: env.accessExpiresIn as StringValue,
   });
 
   const [refreshToken, hashedRefreshToken] = createRefresh();
@@ -56,7 +42,7 @@ export const login = AsyncErrorHandler(async (req, res, next) => {
     data: {
       userId: user.id,
       value: hashedRefreshToken,
-      expiresAt: new Date(Date.now() + ms(refreshTokenExpiresIn)),
+      expiresAt: new Date(Date.now() + ms(env.refreshTokenExpiresIn as StringValue)),
     },
   });
 

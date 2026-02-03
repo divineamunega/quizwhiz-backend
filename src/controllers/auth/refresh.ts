@@ -6,27 +6,7 @@ import ms, { StringValue } from "ms";
 import { hashToken } from "@/utils";
 import { createRefresh } from "@/utils/createRefresh";
 import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
-
-// Environment variable validation
-const environment = process.env.NODE_ENV;
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-const accessExpiresIn = process.env.ACCESS_EXPIRES_IN;
-const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
-const refreshTokenExpiresIn = process.env
-  .REFRESH_TOKEN_EXPIRES_IN as StringValue;
-
-if (
-  !accessSecret ||
-  !accessExpiresIn ||
-  !refreshSecret ||
-  !refreshTokenExpiresIn ||
-  !environment
-) {
-  throw new AppError(
-    "Server misconfiguration: missing environment variables.",
-    500,
-  );
-}
+import { env } from "@/config/env";
 
 export const refresh = AsyncErrorHandler(async (req, res, next) => {
   const rawRefreshToken = req.cookies["_rt"];
@@ -54,9 +34,9 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
   // Token rotation
   const newAccessToken = jwt.sign(
     { id: validToken.userId },
-    accessSecret as StringValue,
+    env.accessTokenSecret,
     {
-      expiresIn: accessExpiresIn as StringValue,
+      expiresIn: env.accessExpiresIn as StringValue,
     },
   );
 
@@ -71,7 +51,9 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
     data: {
       userId: validToken.userId,
       value: hashedRefreshToken,
-      expiresAt: new Date(Date.now() + ms(refreshTokenExpiresIn)),
+      expiresAt: new Date(
+        Date.now() + ms(env.refreshTokenExpiresIn as StringValue),
+      ),
     },
   });
 

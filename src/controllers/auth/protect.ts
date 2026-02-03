@@ -3,11 +3,7 @@ import { AppError } from "@/errors";
 import { prisma } from "@/lib";
 import { AsyncErrorHandler } from "@/middlewares";
 import { verifyJWT } from "@/utils";
-
-const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-if (!accessSecret) {
-  throw new AppError("Missing ACCESS_TOKEN_SECRET environment variable.", 500);
-}
+import { env } from "@/config/env";
 
 const protect = AsyncErrorHandler(async function (
   req: AuthenticatedRequest,
@@ -22,7 +18,7 @@ const protect = AsyncErrorHandler(async function (
   }
 
   const accessToken = authHeader.split(" ")[1];
-  const payload = verifyJWT(accessToken, accessSecret) as {
+  const payload = verifyJWT(accessToken, env.accessTokenSecret) as {
     id: string;
     iat: number;
     exp: number;

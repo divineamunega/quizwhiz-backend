@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { env } from "@/config/env";
 
 class RedisClient {
 	private client: ReturnType<typeof createClient>;
@@ -6,7 +7,7 @@ class RedisClient {
 
 	constructor() {
 		this.client = createClient({
-			url: process.env.REDIS_URL || "redis://localhost:6379",
+			url: env.redisUrl,
 			socket: {
 				reconnectStrategy: (retries) => {
 					// Exponential backoff with max delay of 30 seconds
@@ -50,7 +51,7 @@ class RedisClient {
 			console.error("Failed to connect to Redis:", error);
 			console.warn("Redis is not available. Session features will be limited.");
 			// Don't throw error in development to allow server to start without Redis
-			if (process.env.NODE_ENV === "production") {
+			if (env.nodeEnv === "production") {
 				throw error;
 			}
 		}
