@@ -49,10 +49,19 @@ const getPublicQuizzes = AsyncErrorHandler(async function (
 		orderBy = { createdAt: "desc" };
 	}
 
-	const quizzes = await prisma.quiz.findMany({
+	const parsedLimit = Number(limit);
+	const parsedOffset = Number(offset);
+	const takeUncapped =
+		Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
+	const take = Math.min(takeUncapped, 20);
+	const skip = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
+
+	const [total, quizzes] = await prisma.$transaction([
+		prisma.quiz.count({ where: whereClause }),
+		prisma.quiz.findMany({
 		where: whereClause,
-		take: parseInt(limit as string),
-		skip: parseInt(offset as string),
+		take,
+		skip,
 		orderBy,
 		select: {
 			id: true,
@@ -78,7 +87,8 @@ const getPublicQuizzes = AsyncErrorHandler(async function (
 				},
 			},
 		},
-	});
+		}),
+	]);
 
 	// Transform the data to match frontend expectations
 	const transformedQuizzes = quizzes.map((quiz) => ({
@@ -99,9 +109,9 @@ const getPublicQuizzes = AsyncErrorHandler(async function (
 		status: "success",
 		data: transformedQuizzes,
 		meta: {
-			total: transformedQuizzes.length,
-			limit: parseInt(limit as string),
-			offset: parseInt(offset as string),
+			total,
+			limit: take,
+			offset: skip,
 		},
 	};
 

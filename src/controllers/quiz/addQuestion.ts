@@ -12,7 +12,7 @@ export const addQuestion = AsyncErrorHandler(
 
     const user = req.user!;
 
-    const quiz = await prisma.quiz.findUnique({
+    const quiz = await prisma.quiz.findFirst({
       where: {
         id: quizId,
         isDeleted: false,

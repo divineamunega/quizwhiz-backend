@@ -14,22 +14,19 @@ export const removeQuiz = AsyncErrorHandler(async function (
     throw new AppError("Quiz ID is required", 400);
   }
 
-  try {
-    await prisma.quiz.update({
-      where: {
-        id: quizId,
-        creatorId: userId,
-        isDeleted: false,
-      },
-      data: {
-        isDeleted: true,
-      },
-    });
-  } catch (err: any) {
-    if (err.code === "P2025") {
-      throw new AppError("Quiz not found", 404);
-    }
-    throw err;
+  const result = await prisma.quiz.updateMany({
+    where: {
+      id: quizId,
+      creatorId: userId,
+      isDeleted: false,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+
+  if (result.count === 0) {
+    throw new AppError("Quiz not found", 404);
   }
 
   res.status(204).send();
