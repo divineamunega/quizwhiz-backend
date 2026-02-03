@@ -9,54 +9,60 @@ import { sendRefreshCookie } from "@/utils/sendRefreshCookie";
 import { env } from "@/config/env";
 
 export const signup = AsyncErrorHandler(async (req, res) => {
-	// Extract name, email, and password from the validated request data
-	const { name, email, password } = req.data;
+  // Extract name, email, and password from the validated request data
+  const { name, email, password } = req.data;
 
-	// Hash the password with a salt of 12 rounds
-	const hashedPassword = await bycrypt.hash(password, 10);
+  // Hash the password with a salt of 12 rounds
+  const hashedPassword = await bycrypt.hash(password, 10);
 
-	// Create a new user in the database with the hashed password
-	const newUser = await prisma.user.create({
-		data: {
-			name,
-			email,
-			password: hashedPassword,
-		},
-	});
+  // Create a new user in the database with the hashed password and a refresh token
+  const [refreshToken, hashedRefreshToken] = createRefresh();
+  const { newUser, refreshTokenRecord } = await prisma.$transaction(
+    async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      });
 
-	// Create Access token
-	const accessToken = jwt.sign({ id: newUser.id }, env.accessTokenSecret, {
-		expiresIn: env.accessExpiresIn as StringValue,
-	});
+      const refreshTokenRecord = await tx.refreshToken.create({
+        data: {
+          expiresAt: new Date(
+            Date.now() + ms(env.refreshTokenExpiresIn as StringValue),
+          ),
+          value: hashedRefreshToken,
+          userId: newUser.id,
+        },
+      });
 
-	const [refreshToken, hashedRefreshToken] = createRefresh();
+      return { newUser, refreshTokenRecord };
+    },
+  );
 
-	// TODO Use Prisma transactions
-	await prisma.refreshToken.create({
-		data: {
-			expiresAt: new Date(
-				Date.now() + ms(env.refreshTokenExpiresIn as StringValue)
-			),
-			value: hashedRefreshToken,
-			userId: newUser.id,
-		},
-	});
+  // Create Access token
+  const accessToken = jwt.sign({ id: newUser.id }, env.accessTokenSecret, {
+    expiresIn: env.accessExpiresIn as StringValue,
+  });
 
-	// Send refresh token as http-only cookie
-	sendRefreshCookie(res, refreshToken);
+  // Send refresh token as http-only cookie
+  sendRefreshCookie(res, refreshToken);
 
-	void sendVerificationCode(newUser);
+  // todo change this to an async job later
+  // Send verification code to user's email
+  void sendVerificationCode(newUser);
 
-	// Send response
-	res.status(201).json({
-		message: "success",
-		accessToken: accessToken,
+  // Send response
+  res.status(201).json({
+    message: "success",
+    accessToken: accessToken,
 
-		user: {
-			id: newUser.id,
-			name: newUser.name,
-			email: newUser.email,
-			avatar: newUser.avatar ? newUser.avatar : undefined,
-		},
-	});
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      avatar: newUser.avatar ? newUser.avatar : undefined,
+    },
+  });
 });
