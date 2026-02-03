@@ -16,7 +16,7 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
   }
 
   const hashedRawRefreshToken = hashToken(rawRefreshToken);
-  const validToken = await prisma.refreshToken.findUnique({
+  const validToken = await prisma.refreshToken.findFirst({
     where: {
       value: hashedRawRefreshToken,
       expiresAt: { gt: new Date() },
@@ -42,19 +42,21 @@ export const refresh = AsyncErrorHandler(async (req, res, next) => {
 
   const [newRefreshToken, hashedRefreshToken] = createRefresh();
 
-  await prisma.refreshToken.update({
-    where: { id: validToken.id },
-    data: { revoked: true },
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.refreshToken.update({
+      where: { id: validToken.id },
+      data: { revoked: true },
+    });
 
-  await prisma.refreshToken.create({
-    data: {
-      userId: validToken.userId,
-      value: hashedRefreshToken,
-      expiresAt: new Date(
-        Date.now() + ms(env.refreshTokenExpiresIn as StringValue),
-      ),
-    },
+    await tx.refreshToken.create({
+      data: {
+        userId: validToken.userId,
+        value: hashedRefreshToken,
+        expiresAt: new Date(
+          Date.now() + ms(env.refreshTokenExpiresIn as StringValue),
+        ),
+      },
+    });
   });
 
   sendRefreshCookie(res, newRefreshToken);

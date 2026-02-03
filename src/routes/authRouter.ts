@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { loginValidator, signupValidator } from "@/validators";
 import {
-	login,
-	protect,
-	refresh,
-	signup,
-	verifyEmail,
-	check,
+  login,
+  protect,
+  refresh,
+  signup,
+  verifyEmail,
+  check,
 } from "@/controllers/auth";
 import { resendVerification } from "@/controllers/auth/resendVerification";
 
